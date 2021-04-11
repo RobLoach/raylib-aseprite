@@ -1,12 +1,32 @@
+/*******************************************************************************************
+*
+*   [raylib-aseprite] example - Load a Aseprite file, and display the animated sprites.
+*
+*   This example has been created using raylib 3.5 (www.raylib.com)
+*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*
+*   Example by Rob Loach (@RobLoach)
+*
+*   Copyright (c) 2021 Rob Loach (@RobLoach)
+*
+********************************************************************************************/
+
 #include "raylib.h"
 
 #define RAYLIB_ASEPRITE_IMPLEMENTATION
 #include "raylib-aseprite.h"
 
 int main() {
-    InitWindow(640, 480, "[raylib-aseprite] Example");
+    // Initialization
+    //--------------------------------------------------------------------------------------
+    const int screenWidth = 640;
+    const int screenHeight = 480;
+    InitWindow(screenWidth, screenHeight, "[raylib-aseprite] example");
 
+    // Load the Aseprite file.
     ase_t* ase = LoadAseprite("resources/backpacker.aseprite");
+
+    // Display information about it.
     TraceAseprite(ase);
 
     // Build all the frame information for each tag.
@@ -16,12 +36,12 @@ int main() {
         frame[i] = ase->tags[i].from_frame;
         frameTimer[i] = (float)(ase->frames[frame[i]].duration_milliseconds) / 1000.0f;
     }
+    //--------------------------------------------------------------------------------------
 
     while(!WindowShouldClose()) {
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
 
-        // Update the frame time.
+        // Update
+        //----------------------------------------------------------------------------------
         float timeSpend = GetFrameTime();
         for (int i = 0; i < ase->tag_count; i++) {
             ase_tag_t tag = ase->tags[i];
@@ -34,19 +54,34 @@ int main() {
                 frameTimer[i] = (float)(ase->frames[frame[i]].duration_milliseconds) / 1000.0f;
             }
         }
+        //----------------------------------------------------------------------------------
 
-        // Render
+        // Draw
+        //----------------------------------------------------------------------------------
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+
+        // Loop through each tag, and display the animated sprite.
         for (int i = 0; i < ase->tag_count; i++) {
             ase_tag_t tag = ase->tags[i];
-            DrawText(tag.name, 150, i * 100 + 80, 30, BLACK);
-            Vector2 position = {100, i * 100 + 70};
-            DrawAsepriteEx(ase, frame[i], position, 0, 4, WHITE);
+            DrawText(tag.name, 170, i * 115 + 90, 40, BLACK);
+            Vector2 position = {100, i * 115 + 70};
+
+            // Draw the active frame.
+            DrawAsepriteEx(ase, frame[i], position, 0, 6, WHITE);
         }
 
         EndDrawing();
+        //----------------------------------------------------------------------------------
     }
 
-    UnloadAseprite(ase);
+    // De-Initialization
+    //--------------------------------------------------------------------------------------
+
+    UnloadAseprite(ase);    // Unload Aseprite
+
     CloseWindow();
+    //--------------------------------------------------------------------------------------
+
     return 0;
 }

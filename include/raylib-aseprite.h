@@ -9,7 +9,7 @@
 *
 *   LICENSE: zlib/libpng
 *
-*   raylib-physfs is licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   raylib-aseprite is licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software:
 *
 *   This software is provided "as-is", without any express or implied warranty. In no event
@@ -39,12 +39,11 @@
 extern "C" {
 #endif
 
-ase_t* LoadAseprite(const char* fileName);
-ase_t* LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size);
-Texture GetAsepriteTexture(ase_t* ase);
-void UnloadAseprite(ase_t* ase);
-void TraceAseprite(ase_t* ase);
-Color GetColorFromAsepriteColor(ase_color_t color);
+ase_t* LoadAseprite(const char* fileName);                  // Load an .aseprite file.
+ase_t* LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size);  // Load an aseprite file from memory.
+void UnloadAseprite(ase_t* ase);                            // Unloads the aseprite file.
+void TraceAseprite(ase_t* ase);                             // Display all information associated with the aseprite.
+Texture GetAsepriteTexture(ase_t* ase);                     // Retrieve the raylib texture associated with the aseprite.
 void DrawAseprite(ase_t* ase, int frame, int posX, int posY, Color tint);
 void DrawAsepriteV(ase_t* ase, int frame, Vector2 position, Color tint);
 void DrawAsepriteEx(ase_t* ase, int frame, Vector2 position, float rotation, float scale, Color tint);
@@ -66,33 +65,47 @@ void DrawAsepritePro(ase_t* ase, int frame, Rectangle dest, Vector2 origin, floa
 
 #define CUTE_ASEPRITE_WARNING(msg) TraceLog(LOG_WARNING, msg, __LINE__)
 
+// Override how Cute attempts to load files.
 #define CUTE_ASEPRITE_FILEIO
 #define CUTE_ASEPRITE_SEEK_SET 0
 #define CUTE_ASEPRITE_SEEK_END 0
 #define CUTE_ASEPRITE_FILE void
+
 CUTE_ASEPRITE_FILE* raylib_aseprite_fopen(const char* file, const char* property) {
+    (void)file;
+    (void)property;
     return 0;
 }
+
 void raylib_aseprite_fseek(CUTE_ASEPRITE_FILE* fp, int sz, int pos) {
     (void*)fp;
     (void)sz;
     (void)pos;
 }
+
 void raylib_aseprite_fread(char* data, int sz, int num, CUTE_ASEPRITE_FILE* fp) {
-    (void*)fp;
+    (void)data;
+    (void)sz;
+    (void)num;
+    (void)fp;
 }
+
 int raylib_aseprite_ftell(CUTE_ASEPRITE_FILE* fp) {
+    (void)fp;
     return 0;
 }
+
 void raylib_aseprite_fclose(CUTE_ASEPRITE_FILE* fp) {
     (void*)fp;
 }
+
 #define CUTE_ASEPRITE_FOPEN raylib_aseprite_fopen
 #define CUTE_ASEPRITE_FSEEK raylib_aseprite_fseek
 #define CUTE_ASEPRITE_FREAD raylib_aseprite_fread
 #define CUTE_ASEPRITE_FTELL raylib_aseprite_ftell
 #define CUTE_ASEPRITE_FCLOSE raylib_aseprite_fclose
 
+// Have Cute use raylib's memory functions.
 #define CUTE_ASEPRITE_ALLOC(size, ctx) MemAlloc(size)
 #define CUTE_ASEPRITE_FREE(mem, ctx) MemFree(mem)
 
@@ -127,20 +140,24 @@ ase_t* LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
         ImageDraw(&image, frameImage, src, dest, WHITE);
     }
 
-    // Transparent Pixel
+    // Apply the transparent pixel.
     int transparency  = ase->transparent_palette_entry_index;
     if (transparency >= 0 && transparency < ase->palette.entry_count) {
-        Color source = GetColorFromAsepriteColor(ase->palette.entries[transparency].color);
+        ase_color_t transparentColor = ase->palette.entries[transparency].color;
+        Color source = {
+            .a = transparentColor.a,
+            .r = transparentColor.r,
+            .g = transparentColor.g,
+            .b = transparentColor.b
+        };
         ImageColorReplace(&image, source, BLANK);
     }
 
-    // Create the Texture.
+    // Create the Texture
     Texture2D texture = LoadTextureFromImage(image);
-    UnloadImage(image);
 
-    // Finalize the texture.
-    GenTextureMipmaps(&texture);
-    SetTextureFilter(texture, TEXTURE_FILTER_POINT);
+    // Now that the texture is loaded into the GPU, we can clear the image.
+    UnloadImage(image);
 
     // Save the texture as the Aseprite context.
     ase->mem_ctx = MemAlloc(sizeof(Texture2D));
@@ -157,21 +174,18 @@ ase_t* LoadAseprite(const char* fileName) {
     unsigned int bytesRead;
     unsigned char* fileData = LoadFileData(fileName, &bytesRead);
     if (bytesRead == 0 || fileData == 0) {
-        TraceLog(LOG_ERROR, "ASEPRITE: Failed to load aseprite file.");
+        TraceLog(LOG_ERROR, "ASEPRITE: Failed to load aseprite file %s", fileName);
         return 0;
     }
 
-    return LoadAsepriteFromMemory(fileData, bytesRead);
+    ase_t* ase = LoadAsepriteFromMemory(fileData, bytesRead);
+    UnloadFileData(fileData);
+    return ase;
 }
 
 Texture GetAsepriteTexture(ase_t* ase) {
     Texture2D* texturePointer = (Texture2D*)ase->mem_ctx;
     return *texturePointer;
-}
-
-Color GetColorFromAsepriteColor(ase_color_t color) {
-    Color output = {color.r, color.g, color.b, color.a};
-    return output;
 }
 
 void UnloadAseprite(ase_t* ase) {
@@ -194,7 +208,7 @@ void DrawAseprite(ase_t* ase, int frame, int posX, int posY, Color tint) {
 }
 
 void DrawAsepriteV(ase_t* ase, int frame, Vector2 position, Color tint) {
-    if (frame > ase->frame_count) {
+    if (frame >= ase->frame_count) {
         return;
     }
     Rectangle source = {frame * ase->w, 0, ase->w, ase->h};
@@ -203,7 +217,7 @@ void DrawAsepriteV(ase_t* ase, int frame, Vector2 position, Color tint) {
 }
 
 void DrawAsepriteEx(ase_t* ase, int frame, Vector2 position, float rotation, float scale, Color tint) {
-    if (frame > ase->frame_count) {
+    if (frame >= ase->frame_count) {
         return;
     }
     Rectangle source = {frame * ase->w, 0, ase->w, ase->h};
@@ -214,7 +228,7 @@ void DrawAsepriteEx(ase_t* ase, int frame, Vector2 position, float rotation, flo
 }
 
 void DrawAsepritePro(ase_t* ase, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint) {
-    if (frame > ase->frame_count) {
+    if (frame >= ase->frame_count) {
         return;
     }
     Rectangle source = {frame * ase->w, 0, ase->w, ase->h};
