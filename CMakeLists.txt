@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.11)
 project (raylib-aseprite
-    VERSION 0.0.1
+    VERSION 0.1.
     DESCRIPTION "raylib-aseprite"
     HOMEPAGE_URL "https://github.com/robloach/raylib-aseprite"
     LANGUAGES C)
@@ -15,12 +15,11 @@ if(BUILD_RAYLIB_ASEPRITE_EXAMPLE)
 endif()
 
 # Testing
-# TODO: Add Testing
-# include(CTest)
-# enable_testing()
-# if(BUILD_TESTING AND BUILD_RAYLIB_ASEPRITE_EXAMPLES)
-#     set(CTEST_CUSTOM_TESTS_IGNORE
-#         pkg-config--static
-#     )
-#     add_subdirectory(test)
-# endif()
+include(CTest)
+enable_testing()
+if(BUILD_TESTING AND BUILD_RAYLIB_ASEPRITE_EXAMPLE)
+    set(CTEST_CUSTOM_TESTS_IGNORE
+        pkg-config--static
+    )
+    add_subdirectory(test)
+endif()
