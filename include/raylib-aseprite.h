@@ -63,7 +63,7 @@ void DrawAsepritePro(ase_t* ase, int frame, Rectangle dest, Vector2 origin, floa
 #define CUTE_ASEPRITE_IMPLEMENTATION
 #endif
 
-#define CUTE_ASEPRITE_WARNING(msg) TraceLog(LOG_WARNING, msg, __LINE__)
+#define CUTE_ASEPRITE_WARNING(msg) TraceLog(LOG_WARNING, "ASEPRITE: %s (cute_headers.h:%i)", msg, __LINE__)
 
 // Override how Cute attempts to load files.
 #define CUTE_ASEPRITE_FILEIO
@@ -78,7 +78,7 @@ CUTE_ASEPRITE_FILE* raylib_aseprite_fopen(const char* file, const char* property
 }
 
 void raylib_aseprite_fseek(CUTE_ASEPRITE_FILE* fp, int sz, int pos) {
-    (void*)fp;
+    (void)fp;
     (void)sz;
     (void)pos;
 }
@@ -96,7 +96,7 @@ int raylib_aseprite_ftell(CUTE_ASEPRITE_FILE* fp) {
 }
 
 void raylib_aseprite_fclose(CUTE_ASEPRITE_FILE* fp) {
-    (void*)fp;
+    (void)fp;
 }
 
 #define CUTE_ASEPRITE_FOPEN raylib_aseprite_fopen
@@ -116,7 +116,7 @@ extern "C" {
 #endif
 
 ase_t* LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
-    ase_t* ase = cute_aseprite_load_from_memory(fileData, size, 0);
+    ase_t* ase = cute_aseprite_load_from_memory(fileData, (int)size, 0);
     if (ase == 0) {
         TraceLog(LOG_ERROR, "ASEPRITE: Error loading Aseprite");
         return 0;
@@ -128,8 +128,8 @@ ase_t* LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
     // Load all frames.
     for (int i = 0; i < ase->frame_count; i++) {
         ase_frame_t* frame = ase->frames + i;
-        Rectangle dest = {i * ase->w, 0, ase->w, ase->h};
-        Rectangle src = {0, 0, ase->w, ase->h};
+        Rectangle dest = {(float)(i * ase->w), 0, (float)ase->w, (float)ase->h};
+        Rectangle src = {0, 0, (float)ase->w, (float)ase->h};
         Image frameImage = {
             .data = frame->pixels,
             .width = ase->w,
@@ -203,35 +203,35 @@ void UnloadAseprite(ase_t* ase) {
 }
 
 void DrawAseprite(ase_t* ase, int frame, int posX, int posY, Color tint) {
-    Vector2 position = {posX, posY};
+    Vector2 position = {(float)posX, (float)posY};
     DrawAsepriteV(ase, frame, position, tint);
 }
 
 void DrawAsepriteV(ase_t* ase, int frame, Vector2 position, Color tint) {
-    if (frame >= ase->frame_count) {
+    if (frame < 0 || frame >= ase->frame_count) {
         return;
     }
-    Rectangle source = {frame * ase->w, 0, ase->w, ase->h};
+    Rectangle source = {(float)(frame * ase->w), 0, (float)ase->w, (float)ase->h};
     Texture2D texture = GetAsepriteTexture(ase);
     DrawTextureRec(texture, source, position, tint);
 }
 
 void DrawAsepriteEx(ase_t* ase, int frame, Vector2 position, float rotation, float scale, Color tint) {
-    if (frame >= ase->frame_count) {
+    if (frame < 0 || frame >= ase->frame_count) {
         return;
     }
-    Rectangle source = {frame * ase->w, 0, ase->w, ase->h};
+    Rectangle source = {(float)(frame * ase->w), 0, (float)ase->w, (float)ase->h};
     Texture2D texture = GetAsepriteTexture(ase);
-    Rectangle dest = {position.x, position.y, ase->w * scale, ase->h * scale};
+    Rectangle dest = {(float)position.x, (float)position.y, (float)(ase->w * scale), (float)(ase->h * scale)};
     Vector2 origin = {0, 0};
     DrawTexturePro(texture, source, dest, origin, rotation, tint);           // Draw a part of a texture defined by a rectangle with 'pro' parameters
 }
 
 void DrawAsepritePro(ase_t* ase, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint) {
-    if (frame >= ase->frame_count) {
+    if (frame < 0 || frame >= ase->frame_count) {
         return;
     }
-    Rectangle source = {frame * ase->w, 0, ase->w, ase->h};
+    Rectangle source = {(float)(frame * ase->w), 0, (float)ase->w, (float)ase->h};
     Texture2D texture = GetAsepriteTexture(ase);
     DrawTexturePro(texture, source, dest, origin, rotation, tint);
 }
