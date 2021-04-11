@@ -1,5 +1,6 @@
 # raylib-aseprite-test
 add_executable(raylib-aseprite-test raylib-aseprite-test.c)
+target_compile_options(raylib-aseprite-test PRIVATE -Wall -Wextra -Wconversion -Wsign-conversion)
 target_link_libraries(raylib-aseprite-test PUBLIC
     raylib
     raylib-aseprite)

@@ -12,12 +12,18 @@ int main(int argc, char *argv[]) {
     TraceLog(LOG_INFO, "raylib-aseprite-test");
     TraceLog(LOG_INFO, "================================");
 
+    InitWindow(640, 480, "raylib-aseprite-tests");
+
     // Make sure we're running in the correct directory.
     const char* dir = GetDirectoryPath(argv[0]);
     assert(ChangeDirectory(dir) == true);
 
     ase_t* ase = LoadAseprite("resources/backpacker.aseprite");
     assert(ase != NULL);
+
+    UnloadAseprite(ase);
+
+    CloseWindow();
 
     TraceLog(LOG_INFO, "================================");
     TraceLog(LOG_INFO, "raylib-aseprite tests succesful");
