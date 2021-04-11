@@ -9,17 +9,18 @@ project (raylib-aseprite
 add_subdirectory(include)
 
 # Examples
-option(BUILD_RAYLIB_ASEPRITE_EXAMPLE "Examples" ON)
-if(BUILD_RAYLIB_ASEPRITE_EXAMPLE)
+option(RAYLIB_ASEPRITE_BUILD_EXAMPLE "Examples" ON)
+if(RAYLIB_ASEPRITE_BUILD_EXAMPLE)
     add_subdirectory(example)
 endif()
 
 # Testing
+option(RAYLIB_ASEPRITE_BUILD_TESTS "Testing" ON)
 include(CTest)
 enable_testing()
-if(BUILD_TESTING)
+if(RAYLIB_ASEPRITE_BUILD_TESTS AND RAYLIB_ASEPRITE_BUILD_EXAMPLE)
     set(CTEST_CUSTOM_TESTS_IGNORE
         pkg-config--static
     )
-    add_subdirectory(tests)
+    add_subdirectory(test)
 endif()
