@@ -6,7 +6,7 @@ Load [Aseprite](https://aseprite.org) `.aseprite` files to use animated sprites 
 
 ## Usage
 
-This is a single-file header. To use it, define `RAYLIB_ASEPRITE_IMPLEMENTATION` in one .c source file before including *raylib-aseprite.h*. You will also have to link the raylib dependency.
+This is a header-only library. To use it, define `RAYLIB_ASEPRITE_IMPLEMENTATION` in one .c source file before including *raylib-aseprite.h*. You will also have to link the raylib dependency.
 
 ### Example
 
@@ -46,7 +46,6 @@ ase_t* LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size);
 Texture GetAsepriteTexture(ase_t* ase);
 void UnloadAseprite(ase_t* ase);
 void TraceAseprite(ase_t* ase);
-Color GetColorFromAsepriteColor(ase_color_t color);
 void DrawAseprite(ase_t* ase, int frame, int posX, int posY, Color tint);
 void DrawAsepriteV(ase_t* ase, int frame, Vector2 position, Color tint);
 void DrawAsepriteEx(ase_t* ase, int frame, Vector2 position, float rotation, float scale, Color tint);
@@ -67,7 +66,7 @@ cd examples
 ./raylib-aseprite-example
 ```
 
-This uses [cute_asesprite.h](https://github.com/RandyGaul/cute_headers/blob/master/cute_aseprite.h) to handle loading the aseprite file.
+This uses [cute_asesprite.h](https://github.com/RandyGaul/cute_headers/blob/master/cute_aseprite.h) to handle loading the aseprite file. Thank you to [Randy Gaul's cute_headers](https://github.com/RandyGaul/cute_headers) for making this all possible.
 
 ## License
 
