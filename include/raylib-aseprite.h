@@ -39,15 +39,19 @@
 extern "C" {
 #endif
 
-ase_t* LoadAseprite(const char* fileName);                  // Load an .aseprite file.
-ase_t* LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size);  // Load an aseprite file from memory.
-void UnloadAseprite(ase_t* ase);                            // Unloads the aseprite file.
-void TraceAseprite(ase_t* ase);                             // Display all information associated with the aseprite.
-Texture GetAsepriteTexture(ase_t* ase);                     // Retrieve the raylib texture associated with the aseprite.
-void DrawAseprite(ase_t* ase, int frame, int posX, int posY, Color tint);
-void DrawAsepriteV(ase_t* ase, int frame, Vector2 position, Color tint);
-void DrawAsepriteEx(ase_t* ase, int frame, Vector2 position, float rotation, float scale, Color tint);
-void DrawAsepritePro(ase_t* ase, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint);
+typedef struct Aseprite {
+    ase_t* ase;
+} Aseprite;
+
+Aseprite LoadAseprite(const char* fileName);                    // Load an .aseprite file.
+Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size);  // Load an aseprite file from memory.
+void UnloadAseprite(Aseprite aseprite);                         // Unloads the aseprite file.
+void TraceAseprite(Aseprite aseprite);                          // Display all information associated with the aseprite.
+Texture GetAsepriteTexture(Aseprite aseprite);                  // Retrieve the raylib texture associated with the aseprite.
+void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint);
+void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint);
+void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint);
+void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint);
 
 #ifdef __cplusplus
 }
@@ -64,6 +68,8 @@ void DrawAsepritePro(ase_t* ase, int frame, Rectangle dest, Vector2 origin, floa
 #endif
 
 #define CUTE_ASEPRITE_WARNING(msg) TraceLog(LOG_WARNING, "ASEPRITE: %s (cute_headers.h:%i)", msg, __LINE__)
+
+#define CUTE_ASEPRITE_ASSERT(condition) if (!(condition)) { TraceLog(LOG_ERROR, "ASEPRITE: Failed assert condition in cute_headers.h:%i", __LINE__); }
 
 // Override how Cute attempts to load files.
 #define CUTE_ASEPRITE_FILEIO
@@ -115,11 +121,12 @@ void raylib_aseprite_fclose(CUTE_ASEPRITE_FILE* fp) {
 extern "C" {
 #endif
 
-ase_t* LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
+Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
     ase_t* ase = cute_aseprite_load_from_memory(fileData, (int)size, 0);
     if (ase == 0) {
-        TraceLog(LOG_ERROR, "ASEPRITE: Error loading Aseprite");
-        return 0;
+        struct Aseprite aseprite;
+        aseprite.ase = 0;
+        return aseprite;
     }
 
     // Build the sprite's final image.
@@ -167,32 +174,37 @@ ase_t* LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
     texturePointer->mipmaps = texture.mipmaps;
     texturePointer->width = texture.width;
     texturePointer->height = texture.height;
-    return ase;
+    struct Aseprite aseprite;
+    aseprite.ase = ase;
+    return aseprite;
 }
 
-ase_t* LoadAseprite(const char* fileName) {
+Aseprite LoadAseprite(const char* fileName) {
     unsigned int bytesRead;
     unsigned char* fileData = LoadFileData(fileName, &bytesRead);
     if (bytesRead == 0 || fileData == 0) {
         TraceLog(LOG_ERROR, "ASEPRITE: Failed to load aseprite file %s", fileName);
-        return 0;
+        struct Aseprite aseprite;
+        aseprite.ase = 0;
+        return aseprite;
     }
 
-    ase_t* ase = LoadAsepriteFromMemory(fileData, bytesRead);
+    Aseprite ase = LoadAsepriteFromMemory(fileData, bytesRead);
     UnloadFileData(fileData);
     return ase;
 }
 
-Texture GetAsepriteTexture(ase_t* ase) {
-    Texture2D* texturePointer = (Texture2D*)ase->mem_ctx;
+inline Texture GetAsepriteTexture(Aseprite aseprite) {
+    Texture2D* texturePointer = (Texture2D*)aseprite.ase->mem_ctx;
     return *texturePointer;
 }
 
-void UnloadAseprite(ase_t* ase) {
+void UnloadAseprite(Aseprite aseprite) {
+    ase_t* ase = aseprite.ase;
     // Destroy the texture.
     if (ase->mem_ctx != 0) {
         // Unload the texture from the GPU.
-        UnloadTexture(GetAsepriteTexture(ase));
+        UnloadTexture(GetAsepriteTexture(aseprite));
 
         // Unload the texture data.
         MemFree(ase->mem_ctx);
@@ -202,41 +214,45 @@ void UnloadAseprite(ase_t* ase) {
     cute_aseprite_free(ase);
 }
 
-void DrawAseprite(ase_t* ase, int frame, int posX, int posY, Color tint) {
+void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint) {
     Vector2 position = {(float)posX, (float)posY};
-    DrawAsepriteV(ase, frame, position, tint);
+    DrawAsepriteV(aseprite, frame, position, tint);
 }
 
-void DrawAsepriteV(ase_t* ase, int frame, Vector2 position, Color tint) {
+void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint) {
+    ase_t* ase = aseprite.ase;
     if (frame < 0 || frame >= ase->frame_count) {
         return;
     }
     Rectangle source = {(float)(frame * ase->w), 0, (float)ase->w, (float)ase->h};
-    Texture2D texture = GetAsepriteTexture(ase);
+    Texture2D texture = GetAsepriteTexture(aseprite);
     DrawTextureRec(texture, source, position, tint);
 }
 
-void DrawAsepriteEx(ase_t* ase, int frame, Vector2 position, float rotation, float scale, Color tint) {
+void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint) {
+    ase_t* ase = aseprite.ase;
     if (frame < 0 || frame >= ase->frame_count) {
         return;
     }
     Rectangle source = {(float)(frame * ase->w), 0, (float)ase->w, (float)ase->h};
-    Texture2D texture = GetAsepriteTexture(ase);
+    Texture2D texture = GetAsepriteTexture(aseprite);
     Rectangle dest = {(float)position.x, (float)position.y, (float)(ase->w * scale), (float)(ase->h * scale)};
     Vector2 origin = {0, 0};
     DrawTexturePro(texture, source, dest, origin, rotation, tint);           // Draw a part of a texture defined by a rectangle with 'pro' parameters
 }
 
-void DrawAsepritePro(ase_t* ase, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint) {
+void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint) {
+    ase_t* ase = aseprite.ase;
     if (frame < 0 || frame >= ase->frame_count) {
         return;
     }
     Rectangle source = {(float)(frame * ase->w), 0, (float)ase->w, (float)ase->h};
-    Texture2D texture = GetAsepriteTexture(ase);
+    Texture2D texture = GetAsepriteTexture(aseprite);
     DrawTexturePro(texture, source, dest, origin, rotation, tint);
 }
 
-void TraceAseprite(ase_t* ase) {
+void TraceAseprite(Aseprite aseprite) {
+    ase_t* ase = aseprite.ase;
     TraceLog(LOG_INFO, "ASEPRITE: File information:");
     TraceLog(LOG_INFO, "    > Size:   %ix%i", ase->w, ase->h);
     TraceLog(LOG_INFO, "    > Frames: %i", ase->frame_count);

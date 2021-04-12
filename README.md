@@ -19,20 +19,22 @@ This is a header-only library. To use it, define `RAYLIB_ASEPRITE_IMPLEMENTATION
 int main() {
     InitWindow(640, 480, "Aseprite Example");
 
-    // Load the Aseprite file.
-    ase_t* ase = LoadAseprite("resources/backpacker.aseprite");
+    // Load the backpacker Aseprite file.
+    Aseprite backpacker = LoadAseprite("resources/backpacker.aseprite");
 
     while(!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
         // Draw the 0th frame from the aseprite.
-        DrawAseprite(ase, 0, 100, 100, WHITE);
+        DrawAseprite(backpacker, 0, 100, 100, WHITE);
 
         EndDrawing();
     }
 
-    UnloadAseprite(ase);
+    // Clean up the backpacker aseprite.
+    UnloadAseprite(backpacker);
+
     CloseWindow();
     return 0;
 }
@@ -41,15 +43,15 @@ int main() {
 ### Cheatsheet
 
 ``` c
-ase_t* LoadAseprite(const char* fileName);
-ase_t* LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size);
-Texture GetAsepriteTexture(ase_t* ase);
-void UnloadAseprite(ase_t* ase);
-void TraceAseprite(ase_t* ase);
-void DrawAseprite(ase_t* ase, int frame, int posX, int posY, Color tint);
-void DrawAsepriteV(ase_t* ase, int frame, Vector2 position, Color tint);
-void DrawAsepriteEx(ase_t* ase, int frame, Vector2 position, float rotation, float scale, Color tint);
-void DrawAsepritePro(ase_t* ase, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint);
+Aseprite LoadAseprite(const char* fileName);                  // Load an .aseprite file.
+Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size);  // Load an aseprite file from memory.
+void UnloadAseprite(Aseprite ase);                            // Unloads the aseprite file.
+void TraceAseprite(Aseprite ase);                             // Display all information associated with the aseprite.
+Texture GetAsepriteTexture(Aseprite ase);                     // Retrieve the raylib texture associated with the aseprite.
+void DrawAseprite(Aseprite ase, int frame, int posX, int posY, Color tint);
+void DrawAsepriteV(Aseprite ase, int frame, Vector2 position, Color tint);
+void DrawAsepriteEx(Aseprite ase, int frame, Vector2 position, float rotation, float scale, Color tint);
+void DrawAsepritePro(Aseprite ase, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint);
 ```
 
 ## Development

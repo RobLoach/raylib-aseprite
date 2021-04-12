@@ -21,33 +21,33 @@ int main(int argc, char *argv[]) {
     assert(ChangeDirectory(dir));
 
     // LoadAseprite()
-    ase_t* ase = LoadAseprite("resources/backpacker.aseprite");
-    assert(ase != NULL);
-    assert(ase->frame_count > 5);
+    Aseprite aseprite = LoadAseprite("resources/backpacker.aseprite");
+    assert(aseprite.ase != NULL);
+    assert(aseprite.ase->frame_count > 5);
 
     // TraceAseprite()
-    TraceAseprite(ase);
+    TraceAseprite(aseprite);
 
     // GetAsepriteTexture()
-    Texture texture = GetAsepriteTexture(ase);
+    Texture texture = GetAsepriteTexture(aseprite);
     assert(texture.width > 2);
     assert(texture.height > 2);
 
     BeginDrawing();
     {
         // DrawAseprite()
-        DrawAseprite(ase, 3, 10, 10, WHITE);
+        DrawAseprite(aseprite, 3, 10, 10, WHITE);
         // DrawAsepriteV()
-        DrawAsepriteV(ase, 5, (Vector2){10, 20}, WHITE);
+        DrawAsepriteV(aseprite, 5, (Vector2){10, 20}, WHITE);
         // DrawAsepriteEx()
-        DrawAsepriteEx(ase, 6, (Vector2){10, 30}, 20, 3, WHITE);
+        DrawAsepriteEx(aseprite, 6, (Vector2){10, 30}, 20, 3, WHITE);
         // DrawAsepritePro()
-        DrawAsepritePro(ase, 7, (Rectangle){30, 30, 20, 20}, (Vector2){0, 0}, 0.5f, WHITE);
+        DrawAsepritePro(aseprite, 7, (Rectangle){30, 30, 20, 20}, (Vector2){0, 0}, 0.5f, WHITE);
     }
     EndDrawing();
 
     // UnloadAseprite()
-    UnloadAseprite(ase);
+    UnloadAseprite(aseprite);
 
     CloseWindow();
     TraceLog(LOG_INFO, "================================");

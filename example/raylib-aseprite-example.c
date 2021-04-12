@@ -24,10 +24,15 @@ int main() {
     InitWindow(screenWidth, screenHeight, "[raylib-aseprite] example");
 
     // Load the Aseprite file.
-    ase_t* ase = LoadAseprite("resources/backpacker.aseprite");
+    Aseprite aseprite = LoadAseprite("resources/backpacker.aseprite");
+    ase_t* ase = aseprite.ase;
+
+    // TODO: Add a Tag Manager/Renderer.
+    //Tag tag = LoadAsepriteTag(ase, "Walk Down");
+    //UpdateAseprite(ase);
 
     // Display information about it.
-    TraceAseprite(ase);
+    TraceAseprite(aseprite);
 
     // Build all the frame information for each tag.
     int frame[ase->tag_count];
@@ -68,7 +73,7 @@ int main() {
             Vector2 position = {100, i * 115 + 70};
 
             // Draw the active frame.
-            DrawAsepriteEx(ase, frame[i], position, 0, 6, WHITE);
+            DrawAsepriteEx(aseprite, frame[i], position, 0, 6, WHITE);
         }
 
         EndDrawing();
@@ -78,7 +83,7 @@ int main() {
     // De-Initialization
     //--------------------------------------------------------------------------------------
 
-    UnloadAseprite(ase);    // Unload Aseprite
+    UnloadAseprite(aseprite);    // Unload the Aseprite data.
 
     CloseWindow();
     //--------------------------------------------------------------------------------------
