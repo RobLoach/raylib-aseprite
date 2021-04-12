@@ -22,12 +22,22 @@ int main() {
     // Load the backpacker Aseprite file.
     Aseprite backpacker = LoadAseprite("resources/backpacker.aseprite");
 
+    // Load the Walk Down tag.
+    AsepriteTag walkdown = LoadAsepriteTag(backpacker, "Walk Down");
+    walkdown.speed = 2; // Double the animation speed.
+
     while(!WindowShouldClose()) {
+        // Update the animation frame for walk down.
+        UpdateAsperiteTag(&walkdown);
+
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        // Draw the 0th frame from the aseprite.
+        // Draw the 0th frame from the backpacker sprite.
         DrawAseprite(backpacker, 0, 100, 100, WHITE);
+
+        // Draw the walkdown animation tag.
+        DrawAsepriteTag(walkdown, 200, 100, WHITE);
 
         EndDrawing();
     }
@@ -43,15 +53,25 @@ int main() {
 ### Cheatsheet
 
 ``` c
-Aseprite LoadAseprite(const char* fileName);                  // Load an .aseprite file.
-Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size);  // Load an aseprite file from memory.
-void UnloadAseprite(Aseprite ase);                            // Unloads the aseprite file.
-void TraceAseprite(Aseprite ase);                             // Display all information associated with the aseprite.
-Texture GetAsepriteTexture(Aseprite ase);                     // Retrieve the raylib texture associated with the aseprite.
-void DrawAseprite(Aseprite ase, int frame, int posX, int posY, Color tint);
-void DrawAsepriteV(Aseprite ase, int frame, Vector2 position, Color tint);
-void DrawAsepriteEx(Aseprite ase, int frame, Vector2 position, float rotation, float scale, Color tint);
-void DrawAsepritePro(Aseprite ase, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint);
+Aseprite LoadAseprite(const char* fileName);                        // Load an .aseprite file
+Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size);  // Load an aseprite file from memory
+void UnloadAseprite(Aseprite aseprite);                             // Unloads the aseprite file
+void TraceAseprite(Aseprite aseprite);                              // Display all information associated with the aseprite
+Texture GetAsepriteTexture(Aseprite aseprite);                      // Retrieve the raylib texture associated with the aseprite
+void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint);
+void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint);
+void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint);
+void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint);
+
+AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name);   // Load a Aseprite tag animation sequence
+AsepriteTag LoadAsepriteTagFromId(Aseprite aseprite, int id);       // Load a Aseprite tag animation sequence from its index
+void UpdateAsepriteTag(AsepriteTag* tag);                           // Update the tag animation frame if needed
+void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint);
+void DrawAsepriteTagV(AsepriteTag tag, Vector2 position, Color tint);
+void DrawAsepriteTagEx(AsepriteTag tag, Vector2 position, float rotation, float scale, Color tint);
+void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, Color tint);
+const char* GetAsepriteTagName(AsepriteTag tag);                    // Retrieve the given tag's name
+int GetAspriteTagCount(Aseprite aseprite);                          // Get the total amount of available tags from the loaded Aseprite
 ```
 
 ## Development

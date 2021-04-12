@@ -28,6 +28,26 @@ int main(int argc, char *argv[]) {
     // TraceAseprite()
     TraceAseprite(aseprite);
 
+    // LoadAsepriteTag()
+    AsepriteTag tag = LoadAsepriteTag(aseprite, "Walk Down");
+    assert(tag.timer > 0);
+
+    // GetAspriteTagCount()
+    assert(GetAspriteTagCount(aseprite) > 2);
+
+    // GetAsepriteTagName()
+    const char* name = GetAsepriteTagName(tag);
+    assert(TextIsEqual(name, "Walk Down"));
+
+    // LoadAsepriteTagFromId()
+    {
+        AsepriteTag tag2 = LoadAsepriteTagFromId(aseprite, 2);
+        assert(tag2.speed == 1.0f);
+        assert(tag2.currentFrame == 17);
+        const char* name = GetAsepriteTagName(tag2);
+        assert(TextIsEqual(name, "Walk Up"));
+    }
+
     // GetAsepriteTexture()
     Texture texture = GetAsepriteTexture(aseprite);
     assert(texture.width > 2);
@@ -43,6 +63,15 @@ int main(int argc, char *argv[]) {
         DrawAsepriteEx(aseprite, 6, (Vector2){10, 30}, 20, 3, WHITE);
         // DrawAsepritePro()
         DrawAsepritePro(aseprite, 7, (Rectangle){30, 30, 20, 20}, (Vector2){0, 0}, 0.5f, WHITE);
+
+        // DrawAsepriteTag()
+        DrawAsepriteTag(tag, 10, 10, WHITE);
+        // DrawAsepriteTagV()
+        DrawAsepriteTagV(tag, (Vector2){10, 20}, WHITE);
+        // DrawAsepriteTagEx()
+        DrawAsepriteTagEx(tag, (Vector2){10, 30}, 20, 3, WHITE);
+        // DrawAsepriteTagPro()
+        DrawAsepriteTagPro(tag, (Rectangle){30, 30, 20, 20}, (Vector2){0, 0}, 0.5f, WHITE);
     }
     EndDrawing();
 

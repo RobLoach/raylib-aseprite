@@ -25,16 +25,15 @@ int main() {
 
     // Load the Aseprite file.
     Aseprite aseprite = LoadAseprite("resources/backpacker.aseprite");
-    ase_t* ase = aseprite.ase;
-
-    // TODO: Add a Tag Manager/Renderer.
-    //Tag tag = LoadAsepriteTag(ase, "Walk Down");
-    //UpdateAseprite(ase);
 
     // Display information about it.
     TraceAseprite(aseprite);
 
+    // Load the "Walk Down" tag from aseprite.
+    AsepriteTag walkdown = LoadAsepriteTag(aseprite, "Walk Down");
+
     // Build all the frame information for each tag.
+    ase_t* ase = aseprite.ase;
     int frame[ase->tag_count];
     float frameTimer[ase->tag_count];
     for (int i = 0; i < ase->tag_count; i++) {
@@ -47,6 +46,19 @@ int main() {
 
         // Update
         //----------------------------------------------------------------------------------
+
+        // Pause the animation if the space key is down.
+        if (IsKeyDown(KEY_SPACE)) {
+            walkdown.speed = 0;
+        }
+        else {
+            walkdown.speed = 2;
+        }
+
+        // Update the active animation of the walk down tag.
+        UpdateAsepriteTag(&walkdown);
+
+        // Manually update the sprites.
         float timeSpend = GetFrameTime();
         for (int i = 0; i < ase->tag_count; i++) {
             ase_tag_t tag = ase->tags[i];
@@ -64,18 +76,22 @@ int main() {
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        {
+            ClearBackground(RAYWHITE);
 
-        // Loop through each tag, and display the animated sprite.
-        for (int i = 0; i < ase->tag_count; i++) {
-            ase_tag_t tag = ase->tags[i];
-            DrawText(tag.name, 170, i * 115 + 90, 40, BLACK);
-            Vector2 position = {100, i * 115 + 70};
+            // Loop through each tag, and display the animated sprite.
+            for (int i = 0; i < ase->tag_count; i++) {
+                ase_tag_t tag = ase->tags[i];
+                DrawText(tag.name, 170, i * 115 + 90, 40, BLACK);
+                Vector2 position = {100, i * 115 + 70};
 
-            // Draw the active frame.
-            DrawAsepriteEx(aseprite, frame[i], position, 0, 6, WHITE);
+                // Draw the active frame.
+                DrawAsepriteEx(aseprite, frame[i], position, 0, 6, WHITE);
+            }
+
+            // Display the loaded walkdown tag in animation.
+            DrawAsepriteTagEx(walkdown, (Vector2){470, 120}, 0, 16, WHITE);
         }
-
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
