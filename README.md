@@ -36,7 +36,7 @@ int main() {
         // Draw the 0th frame from the backpacker sprite.
         DrawAseprite(backpacker, 0, 100, 100, WHITE);
 
-        // Draw the walkdown animation tag.
+        // Draw the Walk Down animation.
         DrawAsepriteTag(walkdown, 200, 100, WHITE);
 
         EndDrawing();
@@ -53,25 +53,31 @@ int main() {
 ### Cheatsheet
 
 ``` c
+// Aseprite
 Aseprite LoadAseprite(const char* fileName);                        // Load an .aseprite file
 Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size);  // Load an aseprite file from memory
+bool IsAsepriteReady(Aseprite aseprite);                            // Check if the given Aseprite was loaded successfully.
 void UnloadAseprite(Aseprite aseprite);                             // Unloads the aseprite file
 void TraceAseprite(Aseprite aseprite);                              // Display all information associated with the aseprite
 Texture GetAsepriteTexture(Aseprite aseprite);                      // Retrieve the raylib texture associated with the aseprite
+int GetAsepriteWidth(Aseprite aseprite);                            // Get the width of the sprite.
+int GetAsepriteHeight(Aseprite aseprite);                           // Get the height of the sprite.
+int GetAspriteTagCount(Aseprite aseprite);                          // Get the total amount of available tags
 void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint);
 void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint);
 void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint);
 void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint);
 
+// AsepriteTag
 AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name);   // Load a Aseprite tag animation sequence
-AsepriteTag LoadAsepriteTagFromId(Aseprite aseprite, int id);       // Load a Aseprite tag animation sequence from its index
+AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index); // Load a Aseprite tag animation sequence from its index
+bool IsAsepriteTagReady(AsepriteTag tag);                           // Check if the given Aseprite tag was loaded successfully.
 void UpdateAsepriteTag(AsepriteTag* tag);                           // Update the tag animation frame if needed
+AsepriteTag GenAsepriteTagDefault();                                // Generate an empty Tag with sane defaults
 void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint);
 void DrawAsepriteTagV(AsepriteTag tag, Vector2 position, Color tint);
 void DrawAsepriteTagEx(AsepriteTag tag, Vector2 position, float rotation, float scale, Color tint);
 void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, Color tint);
-const char* GetAsepriteTagName(AsepriteTag tag);                    // Retrieve the given tag's name
-int GetAspriteTagCount(Aseprite aseprite);                          // Get the total amount of available tags from the loaded Aseprite
 ```
 
 ## Development

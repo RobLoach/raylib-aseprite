@@ -25,27 +25,33 @@ int main(int argc, char *argv[]) {
     assert(aseprite.ase != NULL);
     assert(aseprite.ase->frame_count > 5);
 
+    // IsAsepriteReady()
+    assert(IsAsepriteReady(aseprite));
+
     // TraceAseprite()
     TraceAseprite(aseprite);
 
     // LoadAsepriteTag()
     AsepriteTag tag = LoadAsepriteTag(aseprite, "Walk Down");
     assert(tag.timer > 0);
+    assert(tag.color.r == (BLACK).r);
+    assert(tag.color.g == (BLACK).g);
+    assert(tag.color.b == (BLACK).b);
+    assert(tag.color.a == (BLACK).a);
+    assert(TextIsEqual(tag.name, "Walk Down"));
+
+    // IsAsepriteTagReady()
+    assert(IsAsepriteTagReady(tag));
 
     // GetAspriteTagCount()
     assert(GetAspriteTagCount(aseprite) > 2);
 
-    // GetAsepriteTagName()
-    const char* name = GetAsepriteTagName(tag);
-    assert(TextIsEqual(name, "Walk Down"));
-
-    // LoadAsepriteTagFromId()
+    // LoadAsepriteTagFromIndex()
     {
-        AsepriteTag tag2 = LoadAsepriteTagFromId(aseprite, 2);
+        AsepriteTag tag2 = LoadAsepriteTagFromIndex(aseprite, 2);
         assert(tag2.speed == 1.0f);
         assert(tag2.currentFrame == 17);
-        const char* name = GetAsepriteTagName(tag2);
-        assert(TextIsEqual(name, "Walk Up"));
+        assert(TextIsEqual(tag2.name, "Walk Up"));
     }
 
     // GetAsepriteTexture()

@@ -26,6 +26,10 @@ int main() {
     // Load the Aseprite file.
     Aseprite aseprite = LoadAseprite("resources/backpacker.aseprite");
 
+    if (!IsAsepriteReady(aseprite)) {
+        TraceLog(LOG_FATAL, "Failed to load resources/backpacker.aseprite");
+    }
+
     // Display information about it.
     TraceAseprite(aseprite);
 
@@ -53,6 +57,12 @@ int main() {
         }
         else {
             walkdown.speed = 2;
+        }
+
+        if (IsKeyPressed(KEY_P)) {
+            walkdown.loop = false;
+            walkdown.paused = false;
+            walkdown.currentFrame = walkdown.tag->from_frame;
         }
 
         // Update the active animation of the walk down tag.

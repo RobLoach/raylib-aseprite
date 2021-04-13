@@ -39,38 +39,60 @@
 extern "C" {
 #endif
 
+/**
+ * The loaded Aseprite data.
+ *
+ * @see LoadAseprite()
+ * @see UnloadAseprite()
+ */
 typedef struct Aseprite {
-    ase_t* ase;
+    ase_t* ase;         // Pointer to the cute_aseprite data.
 } Aseprite;
 
+/**
+ * Tag information from Aseprite.
+ *
+ * @see LoadAsepriteTag()
+ * @see LoadAsepriteTagFromIndex()
+ */
 typedef struct AsepriteTag {
-    ase_tag_t* tag;
-    Aseprite aseprite;
-    int currentFrame;
-    float timer;
-    int direction;
-    float speed;
+    char* name;         // The name of the tag.
+    int currentFrame;   // The frame that the tag is currently on
+    float timer;        // The countdown timer in seconds
+    int direction;      // Whether we are moving forwards, or backwards through the frames
+    float speed;        // The animation speed factor (1 is normal speed, 2 is double speed)
+    Color color;        // The color provided for the tag
+    bool loop;          // Whether to continue to play the animation when the animation finishes
+    bool paused;        // Set to true to not progression of the animation
+    Aseprite aseprite;  // The loaded Aseprite file
+    ase_tag_t* tag;     // The active tag to act upon
 } AsepriteTag;
 
+// Aseprite
 Aseprite LoadAseprite(const char* fileName);                        // Load an .aseprite file
 Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size);  // Load an aseprite file from memory
+bool IsAsepriteReady(Aseprite aseprite);                            // Check if the given Aseprite was loaded successfully.
 void UnloadAseprite(Aseprite aseprite);                             // Unloads the aseprite file
 void TraceAseprite(Aseprite aseprite);                              // Display all information associated with the aseprite
 Texture GetAsepriteTexture(Aseprite aseprite);                      // Retrieve the raylib texture associated with the aseprite
+int GetAsepriteWidth(Aseprite aseprite);                            // Get the width of the sprite.
+int GetAsepriteHeight(Aseprite aseprite);                           // Get the height of the sprite.
+int GetAspriteTagCount(Aseprite aseprite);                          // Get the total amount of available tags
 void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint);
 void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint);
 void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint);
 void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint);
 
+// AsepriteTag
 AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name);   // Load a Aseprite tag animation sequence
-AsepriteTag LoadAsepriteTagFromId(Aseprite aseprite, int id);       // Load a Aseprite tag animation sequence from its index
-void UpdateAsepriteTag(AsepriteTag* tag);                           // Update the tag animation frame if needed
+AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index);    // Load a Aseprite tag animation sequence from its index
+bool IsAsepriteTagReady(AsepriteTag tag);                           // Check if the given Aseprite tag was loaded successfully.
+void UpdateAsepriteTag(AsepriteTag* tag);                           // Update the tag animation frame
+AsepriteTag GenAsepriteTagDefault();                                // Generate an empty Tag with sane defaults
 void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint);
 void DrawAsepriteTagV(AsepriteTag tag, Vector2 position, Color tint);
 void DrawAsepriteTagEx(AsepriteTag tag, Vector2 position, float rotation, float scale, Color tint);
 void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, Color tint);
-const char* GetAsepriteTagName(AsepriteTag tag);                    // Retrieve the given tag's name
-int GetAspriteTagCount(Aseprite aseprite);                          // Get the total amount of available tags from the loaded Aseprite
 
 #ifdef __cplusplus
 }
@@ -86,53 +108,49 @@ int GetAspriteTagCount(Aseprite aseprite);                          // Get the t
 #define CUTE_ASEPRITE_IMPLEMENTATION
 #endif
 
+// Have cute_aseprite report warnings through raylib.
 #define CUTE_ASEPRITE_WARNING(msg) TraceLog(LOG_WARNING, "ASEPRITE: %s (cute_headers.h:%i)", msg, __LINE__)
 
-#define CUTE_ASEPRITE_ASSERT(condition) if (!(condition)) { TraceLog(LOG_ERROR, "ASEPRITE: Failed assert condition in cute_headers.h:%i", __LINE__); }
+// Have failed cute_aseprite assertions report an error through raylib.
+#define CUTE_ASEPRITE_ASSERT(condition) if (!(condition)) { TraceLog(LOG_WARNING, "ASEPRITE: Failed assert \"%s\" in %s:%i", #condition, __FILE__, __LINE__); }
 
 // Override how Cute attempts to load files.
 #define CUTE_ASEPRITE_FILEIO
 #define CUTE_ASEPRITE_SEEK_SET 0
 #define CUTE_ASEPRITE_SEEK_END 0
 #define CUTE_ASEPRITE_FILE void
-
 CUTE_ASEPRITE_FILE* raylib_aseprite_fopen(const char* file, const char* property) {
     (void)file;
     (void)property;
     return 0;
 }
-
 void raylib_aseprite_fseek(CUTE_ASEPRITE_FILE* fp, int sz, int pos) {
     (void)fp;
     (void)sz;
     (void)pos;
 }
-
 void raylib_aseprite_fread(char* data, int sz, int num, CUTE_ASEPRITE_FILE* fp) {
     (void)data;
     (void)sz;
     (void)num;
     (void)fp;
 }
-
 int raylib_aseprite_ftell(CUTE_ASEPRITE_FILE* fp) {
     (void)fp;
     return 0;
 }
-
 void raylib_aseprite_fclose(CUTE_ASEPRITE_FILE* fp) {
     (void)fp;
 }
-
 #define CUTE_ASEPRITE_FOPEN raylib_aseprite_fopen
 #define CUTE_ASEPRITE_FSEEK raylib_aseprite_fseek
 #define CUTE_ASEPRITE_FREAD raylib_aseprite_fread
 #define CUTE_ASEPRITE_FTELL raylib_aseprite_ftell
 #define CUTE_ASEPRITE_FCLOSE raylib_aseprite_fclose
 
-// Have Cute use raylib's memory functions.
-#define CUTE_ASEPRITE_ALLOC(size, ctx) MemAlloc(size)
-#define CUTE_ASEPRITE_FREE(mem, ctx) MemFree(mem)
+// Have cute_aseprite use raylib's memory functions.
+#define CUTE_ASEPRITE_ALLOC(size, ctx) MemAlloc((int)(size))
+#define CUTE_ASEPRITE_FREE(mem, ctx) MemFree((void*)(mem))
 
 #include "cute_aseprite.h" // NOLINT
 
@@ -140,11 +158,18 @@ void raylib_aseprite_fclose(CUTE_ASEPRITE_FILE* fp) {
 extern "C" {
 #endif
 
+/**
+ * Load an .aseprite file through its memory data.
+ *
+ * @see UnloadAseprite()
+ * @see LoadAseprite()
+ */
 Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
     struct Aseprite aseprite;
+    aseprite.ase = 0;
     ase_t* ase = cute_aseprite_load_from_memory(fileData, (int)size, 0);
-    if (ase == 0) {
-        aseprite.ase = 0;
+    if (ase == 0 || ase->frame_count == 0 || ase->w == 0 || ase->h == 0) {
+        TraceLog(LOG_ERROR, "ASEPRITE: Failed to load Aseprite");
         return aseprite;
     }
 
@@ -197,11 +222,17 @@ Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
     return aseprite;
 }
 
+/**
+ * Load an .aseprite file.
+ *
+ * @see UnloadAseprite()
+ * @see LoadAsepriteFromMemory()
+ */
 Aseprite LoadAseprite(const char* fileName) {
     unsigned int bytesRead;
     unsigned char* fileData = LoadFileData(fileName, &bytesRead);
     if (bytesRead == 0 || fileData == 0) {
-        TraceLog(LOG_ERROR, "ASEPRITE: Failed to load aseprite file %s", fileName);
+        TraceLog(LOG_ERROR, "ASEPRITE: Failed to load aseprite file \"%s\"", fileName);
         struct Aseprite aseprite;
         aseprite.ase = 0;
         return aseprite;
@@ -212,19 +243,69 @@ Aseprite LoadAseprite(const char* fileName) {
     return ase;
 }
 
+bool IsAsepriteReady(Aseprite aseprite) {
+    return aseprite.ase != 0;
+}
+
+/**
+ * Get the loaded raylib texture for the Aseprite.
+ */
 inline Texture GetAsepriteTexture(Aseprite aseprite) {
+    if (aseprite.ase == 0) {
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get Texture from non-existant aseprite");
+        struct Texture texture;
+        texture.id = 0;
+        texture.width = 0;
+        texture.height = 0;
+        texture.mipmaps = 0;
+        texture.format = 0;
+        return texture;
+    }
     Texture2D* texturePointer = (Texture2D*)aseprite.ase->mem_ctx;
     return *texturePointer;
 }
 
+int GetAsepriteWidth(Aseprite aseprite) {
+    if (aseprite.ase == 0) {
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get width from non-existant aseprite");
+        return 0;
+    }
+    return aseprite.ase->w;
+}
+
+int GetAsepriteHeight(Aseprite aseprite) {
+    if (aseprite.ase == 0) {
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get width from non-existant aseprite");
+        return 0;
+    }
+    return aseprite.ase->h;
+}
+
+int GetAspriteTagCount(Aseprite aseprite) {
+    if (aseprite.ase == 0) {
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get tag count non-existant aseprite");
+        return 0;
+    }
+    return aseprite.ase->tag_count;
+}
+
+/**
+ * Unloads the given Aseprite.
+ *
+ * @see LoadAseprite()
+ */
 void UnloadAseprite(Aseprite aseprite) {
     ase_t* ase = aseprite.ase;
+    if (ase == 0) {
+        return;
+    }
+
     // Destroy the texture.
     if (ase->mem_ctx != 0) {
         // Unload the texture from the GPU.
         UnloadTexture(GetAsepriteTexture(aseprite));
 
-        // Unload the texture data.
+        // Unload the texture object.
         MemFree(ase->mem_ctx);
     }
 
@@ -298,9 +379,19 @@ void TraceAseprite(Aseprite aseprite) {
     }
 }
 
+/**
+ * Updates a tag to progress through its animation frame.
+ *
+ * @param tag The AsepriteTag passed in by reference (&tag).
+ */
 void UpdateAsepriteTag(AsepriteTag* tag) {
     if (tag == 0 || tag->tag == 0 || tag->aseprite.ase == 0) {
-        TraceLog(LOG_ERROR, "ASEPRITE: Cannot update empty tag");
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot update empty tag");
+        return;
+    }
+
+    // Don't progress if the tag is paused.
+    if (tag->paused) {
         return;
     }
 
@@ -318,25 +409,49 @@ void UpdateAsepriteTag(AsepriteTag* tag) {
     switch (aseTag->loop_animation_direction) {
         case ASE_ANIMATION_DIRECTION_BACKWORDS:
             if (tag->currentFrame < aseTag->from_frame) {
-                tag->currentFrame = aseTag->to_frame;
+                if (tag->loop) {
+                    tag->currentFrame = aseTag->to_frame;
+                }
+                else {
+                    tag->currentFrame = aseTag->from_frame;
+                    tag->paused = true;
+                }
             }
         break;
         case ASE_ANIMATION_DIRECTION_FORWARDS:
             if (tag->currentFrame > aseTag->to_frame) {
-                tag->currentFrame = aseTag->from_frame;
+                if (tag->loop) {
+                    tag->currentFrame = aseTag->from_frame;
+                }
+                else {
+                    tag->currentFrame = aseTag->to_frame;
+                    tag->paused = true;
+                }
             }
         break;
         case ASE_ANIMATION_DIRECTION_PINGPONG:
             if (tag->direction > 0) {
                 if (tag->currentFrame > aseTag->to_frame) {
                     tag->direction = -1;
-                    tag->currentFrame = aseTag->to_frame - 1;
+                    if (tag->loop) {
+                        tag->currentFrame = aseTag->to_frame - 1;
+                    }
+                    else {
+                        tag->currentFrame = aseTag->to_frame;
+                        tag->paused = true;
+                    }
                 }
             }
             else {
+                tag->direction = 1;
                 if (tag->currentFrame < aseTag->from_frame) {
-                    tag->direction = 1;
-                    tag->currentFrame = aseTag->from_frame + 1;
+                    if (tag->loop) {
+                        tag->currentFrame = aseTag->from_frame + 1;
+                    }
+                    else {
+                        tag->currentFrame = aseTag->from_frame;
+                        tag->paused = true;
+                    }
                 }
             }
         break;
@@ -344,7 +459,7 @@ void UpdateAsepriteTag(AsepriteTag* tag) {
 
     // Reset the timer.
     // TODO: Add the original tag->timer to make up the different in frame time?
-    tag->timer = (float)(ase->frames[tag->currentFrame].duration_milliseconds) / 1000.0f/* + tag->timer; */;
+    tag->timer = (float)(ase->frames[tag->currentFrame].duration_milliseconds) / 1000.0f /* + tag->timer; */;
 }
 
 void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint) {
@@ -363,7 +478,7 @@ void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float r
     DrawAsepritePro(tag.aseprite, tag.currentFrame, dest, origin, rotation, tint);
 }
 
-AsepriteTag LoadAsepriteTagFromId(Aseprite aseprite, int id) {
+AsepriteTag GenAsepriteTagDefault() {
     struct AsepriteTag tag;
     tag.aseprite.ase = 0;
     tag.currentFrame = 0;
@@ -371,19 +486,28 @@ AsepriteTag LoadAsepriteTagFromId(Aseprite aseprite, int id) {
     tag.timer = 0;
     tag.direction = 0;
     tag.speed = 1.0f;
+    tag.color = BLACK;
+    tag.loop = true;
+    tag.paused = false;
+    tag.name = 0;
+    return tag;
+}
+
+AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index) {
+    AsepriteTag tag = GenAsepriteTagDefault();
     ase_t* ase = aseprite.ase;
     if (ase == 0) {
-        TraceLog(LOG_ERROR, "ASEPRITE: Asprite not loaded when attempting to load tag #%i", id);
+        TraceLog(LOG_ERROR, "ASEPRITE: Asprite not loaded when attempting to load tag #%i", index);
         return tag;
     }
 
-    if (id < 0 || id >= ase->tag_count) {
-        TraceLog(LOG_ERROR, "ASEPRITE: Tag index %i out of range for %i tags", id, ase->tag_count);
+    if (index < 0 || index >= ase->tag_count) {
+        TraceLog(LOG_ERROR, "ASEPRITE: Tag index %i out of range for %i tags", index, ase->tag_count);
         return tag;
     }
 
     tag.aseprite.ase = aseprite.ase;
-    tag.tag = &ase->tags[id];
+    tag.tag = &ase->tags[index];
     tag.currentFrame = tag.tag->from_frame;
     tag.direction = 1;
     if (tag.tag->loop_animation_direction == ASE_ANIMATION_DIRECTION_BACKWORDS) {
@@ -391,50 +515,34 @@ AsepriteTag LoadAsepriteTagFromId(Aseprite aseprite, int id) {
         tag.direction = -1;
     }
     tag.timer = (float)(ase->frames[tag.currentFrame].duration_milliseconds) / 1000.0f; // Timer in seconds.
+    tag.color.r = (unsigned char)tag.tag->r;
+    tag.color.g = (unsigned char)tag.tag->g;
+    tag.color.b = (unsigned char)tag.tag->b;
+    tag.name = (char*)tag.tag->name;
     return tag;
 }
 
 AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name) {
-    struct AsepriteTag tag;
-    tag.aseprite.ase = 0;
-    tag.currentFrame = 0;
-    tag.tag = 0;
-    tag.timer = 0;
-    tag.direction = 0;
-    tag.speed = 1.0f;
+    AsepriteTag tag = GenAsepriteTagDefault();
     ase_t* ase = aseprite.ase;
     if (ase == 0) {
-        TraceLog(LOG_ERROR, "ASEPRITE: Asprite not loaded when attempting to load tag '%s'", name);
+        TraceLog(LOG_ERROR, "ASEPRITE: Cannot load tag \"%s\" from an Aseprite that's not loaded", name);
         return tag;
     }
 
     // Loop through all tags to find the correct name.
     for (int i = 0; i < ase->tag_count; i++) {
         if (TextIsEqual(name, ase->tags[i].name)) {
-            return LoadAsepriteTagFromId(aseprite, i);
+            return LoadAsepriteTagFromIndex(aseprite, i);
         }
     }
 
-    TraceLog(LOG_WARNING, "ASEPRITE: Could not find tag %s", name);
+    TraceLog(LOG_WARNING, "ASEPRITE: Could not find tag \"%s\"", name);
     return tag;
 }
 
-const char* GetAsepriteTagName(AsepriteTag tag) {
-    if (tag.tag == 0) {
-        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get name of missing tag");
-        return 0;
-    }
-
-    return tag.tag->name;
-}
-
-int GetAspriteTagCount(Aseprite aseprite) {
-    if (aseprite.ase == 0) {
-        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get tag count when there is not loaded aseprite");
-        return 0;
-    }
-
-    return aseprite.ase->tag_count;
+bool IsAsepriteTagReady(AsepriteTag tag) {
+    return tag.tag != 0;
 }
 
 #ifdef __cplusplus
