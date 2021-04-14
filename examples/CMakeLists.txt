@@ -13,6 +13,13 @@ target_link_libraries(raylib-aseprite-example PUBLIC
     raylib-aseprite
 )
 
+# raylib-aseprite-numbers
+add_executable(raylib-aseprite-numbers raylib-aseprite-numbers.c)
+target_link_libraries(raylib-aseprite-numbers PUBLIC
+    raylib
+    raylib-aseprite
+)
+
 # Copy the resources
 file(GLOB resources resources/*)
 set(test_resources)

@@ -68,25 +68,25 @@ typedef struct AsepriteTag {
     ase_tag_t* tag;     // The active tag to act upon
 } AsepriteTag;
 
-// Aseprite
+// Aseprite functions
 Aseprite LoadAseprite(const char* fileName);                        // Load an .aseprite file
 Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size);  // Load an aseprite file from memory
-bool IsAsepriteReady(Aseprite aseprite);                            // Check if the given Aseprite was loaded successfully.
+bool IsAsepriteReady(Aseprite aseprite);                            // Check if the given Aseprite was loaded successfully
 void UnloadAseprite(Aseprite aseprite);                             // Unloads the aseprite file
 void TraceAseprite(Aseprite aseprite);                              // Display all information associated with the aseprite
 Texture GetAsepriteTexture(Aseprite aseprite);                      // Retrieve the raylib texture associated with the aseprite
-int GetAsepriteWidth(Aseprite aseprite);                            // Get the width of the sprite.
-int GetAsepriteHeight(Aseprite aseprite);                           // Get the height of the sprite.
+int GetAsepriteWidth(Aseprite aseprite);                            // Get the width of the sprite
+int GetAsepriteHeight(Aseprite aseprite);                           // Get the height of the sprite
 int GetAspriteTagCount(Aseprite aseprite);                          // Get the total amount of available tags
 void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint);
 void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint);
 void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint);
 void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint);
 
-// AsepriteTag
+// Aseprite Tag functions
 AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name);   // Load a Aseprite tag animation sequence
 AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index);    // Load a Aseprite tag animation sequence from its index
-bool IsAsepriteTagReady(AsepriteTag tag);                           // Check if the given Aseprite tag was loaded successfully.
+bool IsAsepriteTagReady(AsepriteTag tag);                           // Check if the given Aseprite tag was loaded successfully
 void UpdateAsepriteTag(AsepriteTag* tag);                           // Update the tag animation frame
 AsepriteTag GenAsepriteTagDefault();                                // Generate an empty Tag with sane defaults
 void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint);
@@ -265,6 +265,9 @@ inline Texture GetAsepriteTexture(Aseprite aseprite) {
     return *texturePointer;
 }
 
+/**
+ * Get the width of the aseprite sprite.
+ */
 int GetAsepriteWidth(Aseprite aseprite) {
     if (aseprite.ase == 0) {
         TraceLog(LOG_WARNING, "ASEPRITE: Cannot get width from non-existant aseprite");
@@ -273,6 +276,9 @@ int GetAsepriteWidth(Aseprite aseprite) {
     return aseprite.ase->w;
 }
 
+/**
+ * Get the height of the aseprite sprite.
+ */
 int GetAsepriteHeight(Aseprite aseprite) {
     if (aseprite.ase == 0) {
         TraceLog(LOG_WARNING, "ASEPRITE: Cannot get width from non-existant aseprite");
@@ -281,6 +287,9 @@ int GetAsepriteHeight(Aseprite aseprite) {
     return aseprite.ase->h;
 }
 
+/**
+ * Get the amount of tags defined in the aseprite sprite.
+ */
 int GetAspriteTagCount(Aseprite aseprite) {
     if (aseprite.ase == 0) {
         TraceLog(LOG_WARNING, "ASEPRITE: Cannot get tag count non-existant aseprite");
@@ -353,6 +362,9 @@ void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origi
     DrawTexturePro(texture, source, dest, origin, rotation, tint);
 }
 
+/**
+ * Display information about the loaded asprite.
+ */
 void TraceAseprite(Aseprite aseprite) {
     ase_t* ase = aseprite.ase;
     if (ase == 0) {
@@ -443,8 +455,8 @@ void UpdateAsepriteTag(AsepriteTag* tag) {
                 }
             }
             else {
-                tag->direction = 1;
                 if (tag->currentFrame < aseTag->from_frame) {
+                    tag->direction = 1;
                     if (tag->loop) {
                         tag->currentFrame = aseTag->from_frame + 1;
                     }
@@ -478,6 +490,9 @@ void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float r
     DrawAsepritePro(tag.aseprite, tag.currentFrame, dest, origin, rotation, tint);
 }
 
+/**
+ * Generate an aseprite tag with sane defaults.
+ */
 AsepriteTag GenAsepriteTagDefault() {
     struct AsepriteTag tag;
     tag.aseprite.ase = 0;
@@ -493,6 +508,9 @@ AsepriteTag GenAsepriteTagDefault() {
     return tag;
 }
 
+/**
+ * Load an Aseprite tag from the given index.
+ */
 AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index) {
     AsepriteTag tag = GenAsepriteTagDefault();
     ase_t* ase = aseprite.ase;
@@ -522,6 +540,9 @@ AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index) {
     return tag;
 }
 
+/**
+ * Load an Aseprite tag from the given name.
+ */
 AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name) {
     AsepriteTag tag = GenAsepriteTagDefault();
     ase_t* ase = aseprite.ase;
@@ -541,6 +562,9 @@ AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name) {
     return tag;
 }
 
+/**
+ * Determine whether or not the Aseprite tag was loaded successfully.
+ */
 bool IsAsepriteTagReady(AsepriteTag tag) {
     return tag.tag != 0;
 }
