@@ -1,6 +1,6 @@
 /*******************************************************************************************
 *
-*   [raylib-aseprite] example - Load a Aseprite file, and display the animated sprites.
+*   [raylib-aseprite] example - Load a Aseprite file, and display the animated sprite.
 *
 *   This example has been created using raylib 3.5 (www.raylib.com)
 *   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
@@ -46,8 +46,8 @@ int main() {
     // Start the player facing down.
     int direction = 2;
 
-    // Center the player on the screen, and scale them.
-    const float scale = 3;
+    // Center the scaled player on the screen.
+    const float scale = 4;
     Vector2 playerPosition = {
         GetScreenWidth() / 2 - GetAsepriteWidth(george) / 2 * scale,
         GetScreenHeight() / 2 - GetAsepriteHeight(george) / 2 * scale

@@ -77,15 +77,15 @@ void TraceAseprite(Aseprite aseprite);                              // Display a
 Texture GetAsepriteTexture(Aseprite aseprite);                      // Retrieve the raylib texture associated with the aseprite
 int GetAsepriteWidth(Aseprite aseprite);                            // Get the width of the sprite
 int GetAsepriteHeight(Aseprite aseprite);                           // Get the height of the sprite
-int GetAspriteTagCount(Aseprite aseprite);                          // Get the total amount of available tags
+int GetAsepriteTagCount(Aseprite aseprite);                          // Get the total amount of available tags
 void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint);
 void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint);
 void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint);
 void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint);
 
 // Aseprite Tag functions
-AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name);   // Load a Aseprite tag animation sequence
-AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index);    // Load a Aseprite tag animation sequence from its index
+AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name);   // Load an Aseprite tag animation sequence
+AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index); // Load an Aseprite tag animation sequence from its index
 bool IsAsepriteTagReady(AsepriteTag tag);                           // Check if the given Aseprite tag was loaded successfully
 void UpdateAsepriteTag(AsepriteTag* tag);                           // Update the tag animation frame
 AsepriteTag GenAsepriteTagDefault();                                // Generate an empty Tag with sane defaults
@@ -161,6 +161,9 @@ extern "C" {
 /**
  * Load an .aseprite file through its memory data.
  *
+ * @param fileData The loaded file data for the .aseprite file.
+ * @param size The size of file in bytes.
+ *
  * @see UnloadAseprite()
  * @see LoadAseprite()
  */
@@ -225,8 +228,12 @@ Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
 /**
  * Load an .aseprite file.
  *
+ * @param fileName The path to the file to load.
+ *
+ * @return The loaded Aseprite object, or an empty one on failure.
+ *
  * @see UnloadAseprite()
- * @see LoadAsepriteFromMemory()
+ * @see IsAsepriteReady()
  */
 Aseprite LoadAseprite(const char* fileName) {
     unsigned int bytesRead;
@@ -243,12 +250,23 @@ Aseprite LoadAseprite(const char* fileName) {
     return ase;
 }
 
+/**
+ * Determine whether or not the given Aseprite object was loaded successfully.
+ *
+ * @param aseprite The loaded Aseprite object.
+ *
+ * @return True if the Aseprite was loaded successfully, false otherwise.
+ */
 bool IsAsepriteReady(Aseprite aseprite) {
     return aseprite.ase != 0;
 }
 
 /**
  * Get the loaded raylib texture for the Aseprite.
+ *
+ * @param aseprite The loaded Aseprite object to retrieve the texture for.
+ *
+ * @return The internal texture associated with the Aseprite, or an empty Texture on failure.
  */
 inline Texture GetAsepriteTexture(Aseprite aseprite) {
     if (aseprite.ase == 0) {
@@ -267,6 +285,10 @@ inline Texture GetAsepriteTexture(Aseprite aseprite) {
 
 /**
  * Get the width of the aseprite sprite.
+ *
+ * @param aseprite The loaded Aseprite object to retrieve the width for.
+ *
+ * @return The width of the sprite, or 0 on failure.
  */
 int GetAsepriteWidth(Aseprite aseprite) {
     if (aseprite.ase == 0) {
@@ -278,6 +300,10 @@ int GetAsepriteWidth(Aseprite aseprite) {
 
 /**
  * Get the height of the aseprite sprite.
+ *
+ * @param aseprite The loaded Aseprite object to retrieve the height for.
+ *
+ * @return The height of the sprite, or 0 on failure.
  */
 int GetAsepriteHeight(Aseprite aseprite) {
     if (aseprite.ase == 0) {
@@ -289,8 +315,12 @@ int GetAsepriteHeight(Aseprite aseprite) {
 
 /**
  * Get the amount of tags defined in the aseprite sprite.
+ *
+ * @param aseprite The loaded Aseprite object to retrieve the amount of tags for.
+ *
+ * @return The number of tags that are defined within the aseprite, or 0 on failure.
  */
-int GetAspriteTagCount(Aseprite aseprite) {
+int GetAsepriteTagCount(Aseprite aseprite) {
     if (aseprite.ase == 0) {
         TraceLog(LOG_WARNING, "ASEPRITE: Cannot get tag count non-existant aseprite");
         return 0;
@@ -299,7 +329,9 @@ int GetAspriteTagCount(Aseprite aseprite) {
 }
 
 /**
- * Unloads the given Aseprite.
+ * Unloads the given Aseprite. This will also unload the internal Texture.
+ *
+ * @param aseprite The loaded Aseprite object of which to unload.
  *
  * @see LoadAseprite()
  */
@@ -510,6 +542,14 @@ AsepriteTag GenAsepriteTagDefault() {
 
 /**
  * Load an Aseprite tag from the given index.
+ *
+ * @param aseprite The loaded Aseprite object from which to load the tag.
+ * @param index The tag index within the Aseprite object.
+ *
+ * @return The Aseprite tag information, or an empty tag on failure.
+ *
+ * @see LoadAsepriteTag()
+ * @see IsAsepriteTagReady()
  */
 AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index) {
     AsepriteTag tag = GenAsepriteTagDefault();
@@ -542,6 +582,14 @@ AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index) {
 
 /**
  * Load an Aseprite tag from the given name.
+ *
+ * @param aseprite The Aseprite object to load the tag from.
+ * @param name The name of the tag to be loaded.
+ *
+ * @return The loaded Aseprite tag, or an empty tag on failure.
+ *
+ * @see IsAsepriteTagReady()
+ * @see UpdateAsepriteTag()
  */
 AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name) {
     AsepriteTag tag = GenAsepriteTagDefault();
@@ -564,6 +612,10 @@ AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name) {
 
 /**
  * Determine whether or not the Aseprite tag was loaded successfully.
+ *
+ * @param tag The tag of which to check if it was loaded.
+ *
+ * @return True if the tag was loaded, false otherwise.
  */
 bool IsAsepriteTagReady(AsepriteTag tag) {
     return tag.tag != 0;

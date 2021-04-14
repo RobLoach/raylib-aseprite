@@ -1,6 +1,6 @@
 /*******************************************************************************************
 *
-*   [raylib-aseprite] example - Load a Aseprite file, and display the animated sprites.
+*   [raylib-aseprite] numbers - Load the numbers Aseprite file, and display the different animation directions.
 *
 *   This example has been created using raylib 3.5 (www.raylib.com)
 *   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
@@ -19,6 +19,7 @@
 int main() {
     // Initialization
     //--------------------------------------------------------------------------------------
+
     const int screenWidth = 800;
     const int screenHeight = 450;
     const int textTop = 140;
@@ -28,6 +29,7 @@ int main() {
     // Load the Aseprite file.
     Aseprite numbers = LoadAseprite("resources/numbers.aseprite");
 
+    // Load the tag animations from the numbers aseprite.
     AsepriteTag forwards = LoadAsepriteTag(numbers, "Forwards");
     AsepriteTag backwards = LoadAsepriteTag(numbers, "Backwards");
     AsepriteTag pingpong = LoadAsepriteTag(numbers, "Ping-Pong");
@@ -47,6 +49,7 @@ int main() {
 
         // Draw
         //----------------------------------------------------------------------------------
+
         BeginDrawing();
         {
             ClearBackground(RAYWHITE);

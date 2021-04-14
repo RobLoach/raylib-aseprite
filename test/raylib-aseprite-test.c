@@ -28,6 +28,15 @@ int main(int argc, char *argv[]) {
     // IsAsepriteReady()
     assert(IsAsepriteReady(aseprite));
 
+    // GetAsepriteWidth()
+    assert(GetAsepriteWidth(aseprite) > 5);
+
+    // GetAsepriteHeight()
+    assert(GetAsepriteHeight(aseprite) > 10);
+
+    // GetAsepriteTagCount()
+    assert(GetAsepriteTagCount(aseprite) > 2);
+
     // TraceAseprite()
     TraceAseprite(aseprite);
 
@@ -43,8 +52,8 @@ int main(int argc, char *argv[]) {
     // IsAsepriteTagReady()
     assert(IsAsepriteTagReady(tag));
 
-    // GetAspriteTagCount()
-    assert(GetAspriteTagCount(aseprite) > 2);
+    // GetAsepriteTagCount()
+    assert(GetAsepriteTagCount(aseprite) > 2);
 
     // LoadAsepriteTagFromIndex()
     {
