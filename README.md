@@ -2,7 +2,7 @@
 
 Load [Aseprite](https://aseprite.org) `.aseprite` files to use animated sprites in [raylib](https://raylib.com).
 
-![example/raylib-aseprite-example.png](example/raylib-aseprite-example.png)
+![examples/raylib-aseprite-example.png](examples/raylib-aseprite-example.png)
 
 ## Usage
 
@@ -50,7 +50,7 @@ int main() {
 }
 ```
 
-### Cheatsheet
+### API
 
 ``` c
 // Aseprite functions
