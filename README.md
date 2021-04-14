@@ -61,7 +61,7 @@ int main() {
 }
 ```
 
-See the [examples](examples directory) for more demonstrations of how to use *raylib-aseprite*.
+See the [examples directory](examples) for more demonstrations of how to use *raylib-aseprite*.
 
 ### API
 
