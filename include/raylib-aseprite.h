@@ -170,6 +170,12 @@ extern "C" {
 Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
     struct Aseprite aseprite;
     aseprite.ase = 0;
+
+    if (!IsWindowReady()) {
+        TraceLog(LOG_ERROR, "ASEPRITE: Loading an Aseprite requires the Window to be running");
+        return aseprite;
+    }
+
     ase_t* ase = cute_aseprite_load_from_memory(fileData, (int)size, 0);
     if (ase == 0 || ase->frame_count == 0 || ase->w == 0 || ase->h == 0) {
         TraceLog(LOG_ERROR, "ASEPRITE: Failed to load Aseprite");
