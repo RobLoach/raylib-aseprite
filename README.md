@@ -1,6 +1,6 @@
 # raylib-aseprite
 
-Load [Aseprite](https://aseprite.org) `.aseprite` files for animated sprites in [raylib](https://raylib.com).
+Load [Aseprite](https://www.aseprite.org) `.aseprite` files for animated sprites in [raylib](https://www.raylib.com).
 
 ![examples/raylib-aseprite-example.png](examples/raylib-aseprite-example.png)
 
@@ -61,7 +61,7 @@ int main() {
 }
 ```
 
-See the [examples](examples directory) for more demonstrations of how to use *raylib-aseprite*.
+See the [examples directory](examples) for more demonstrations of how to use *raylib-aseprite*.
 
 ### API
 
@@ -107,7 +107,7 @@ cd examples
 ./raylib-aseprite-example
 ```
 
-This uses [cute_asesprite.h](https://github.com/RandyGaul/cute_headers/blob/master/cute_aseprite.h) to handle loading the aseprite file. Thank you to [Randy Gaul's cute_headers](https://github.com/RandyGaul/cute_headers) for making this all possible.
+This uses [cute_aseprite.h](https://github.com/RandyGaul/cute_headers/blob/master/cute_aseprite.h) to handle loading the aseprite file. Thank you to [Randy Gaul's cute_headers](https://github.com/RandyGaul/cute_headers) for making this all possible.
 
 ## License
 
