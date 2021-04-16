@@ -75,7 +75,7 @@ void TraceAseprite(Aseprite aseprite);                              // Display a
 Texture GetAsepriteTexture(Aseprite aseprite);                      // Retrieve the raylib texture associated with the aseprite
 int GetAsepriteWidth(Aseprite aseprite);                            // Get the width of the sprite
 int GetAsepriteHeight(Aseprite aseprite);                           // Get the height of the sprite
-int GetAsepriteTagCount(Aseprite aseprite);                          // Get the total amount of available tags
+int GetAsepriteTagCount(Aseprite aseprite);                         // Get the total amount of available tags
 void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint);
 void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint);
 void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint);

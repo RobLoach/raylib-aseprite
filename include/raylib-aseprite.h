@@ -77,7 +77,7 @@ void TraceAseprite(Aseprite aseprite);                              // Display a
 Texture GetAsepriteTexture(Aseprite aseprite);                      // Retrieve the raylib texture associated with the aseprite
 int GetAsepriteWidth(Aseprite aseprite);                            // Get the width of the sprite
 int GetAsepriteHeight(Aseprite aseprite);                           // Get the height of the sprite
-int GetAsepriteTagCount(Aseprite aseprite);                          // Get the total amount of available tags
+int GetAsepriteTagCount(Aseprite aseprite);                         // Get the total amount of available tags
 void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint);
 void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint);
 void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint);
@@ -228,6 +228,8 @@ Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
     texturePointer->width = texture.width;
     texturePointer->height = texture.height;
     aseprite.ase = ase;
+    TraceLog(LOG_INFO, "ASEPRITE: Loaded successfully (%ix%i - %i frames)", ase->w, ase->h, ase->frame_count);
+
     return aseprite;
 }
 
@@ -285,6 +287,7 @@ inline Texture GetAsepriteTexture(Aseprite aseprite) {
         texture.format = 0;
         return texture;
     }
+
     Texture2D* texturePointer = (Texture2D*)aseprite.ase->mem_ctx;
     return *texturePointer;
 }
@@ -301,6 +304,7 @@ int GetAsepriteWidth(Aseprite aseprite) {
         TraceLog(LOG_WARNING, "ASEPRITE: Cannot get width from non-existant aseprite");
         return 0;
     }
+
     return aseprite.ase->w;
 }
 
@@ -316,6 +320,7 @@ int GetAsepriteHeight(Aseprite aseprite) {
         TraceLog(LOG_WARNING, "ASEPRITE: Cannot get width from non-existant aseprite");
         return 0;
     }
+
     return aseprite.ase->h;
 }
 
@@ -331,6 +336,7 @@ int GetAsepriteTagCount(Aseprite aseprite) {
         TraceLog(LOG_WARNING, "ASEPRITE: Cannot get tag count non-existant aseprite");
         return 0;
     }
+
     return aseprite.ase->tag_count;
 }
 
@@ -358,6 +364,8 @@ void UnloadAseprite(Aseprite aseprite) {
 
     // Destory the aseprite data.
     cute_aseprite_free(ase);
+
+    TraceLog(LOG_INFO, "ASEPRITE: Unloaded Aseprite data successfully");
 }
 
 void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint) {
@@ -406,14 +414,11 @@ void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origi
 void TraceAseprite(Aseprite aseprite) {
     ase_t* ase = aseprite.ase;
     if (ase == 0) {
-        TraceLog(LOG_INFO, "ASEPRITE: Empty file information");
+        TraceLog(LOG_INFO, "ASEPRITE: Empty Aseprite information");
         return;
     }
 
-    TraceLog(LOG_INFO, "ASEPRITE: File information:");
-    TraceLog(LOG_INFO, "    > Size:   %ix%i", ase->w, ase->h);
-    TraceLog(LOG_INFO, "    > Frames: %i", ase->frame_count);
-    TraceLog(LOG_INFO, "    > Slices: %i", ase->slice_count);
+    TraceLog(LOG_INFO, "ASEPRITE: Aseprite information: (%ix%i - %i frames)", ase->w, ase->h, ase->frame_count);
     TraceLog(LOG_INFO, "    > Colors: %i", ase->number_of_colors);
     TraceLog(LOG_INFO, "    > Mode:   %i", ase->mode);
     TraceLog(LOG_INFO, "    > Layers: %i", ase->layer_count);
@@ -426,6 +431,12 @@ void TraceAseprite(Aseprite aseprite) {
     for (int i = 0; i < ase->tag_count; i++) {
         ase_tag_t* tag = ase->tags + i;
         TraceLog(LOG_INFO, "      - %s", tag->name);
+    }
+
+    TraceLog(LOG_INFO, "    > Slices: %i", ase->slice_count);
+    for (int i = 0; i < ase->slice_count; i++) {
+        ase_slice_t* slice = ase->slices + i;
+        TraceLog(LOG_INFO, "      - %s", slice->name);
     }
 }
 
@@ -530,6 +541,8 @@ void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float r
 
 /**
  * Generate an aseprite tag with sane defaults.
+ *
+ * @return An AsepriteTag with sane defaults.
  */
 AsepriteTag GenAsepriteTagDefault() {
     struct AsepriteTag tag;
@@ -543,6 +556,7 @@ AsepriteTag GenAsepriteTagDefault() {
     tag.loop = true;
     tag.paused = false;
     tag.name = 0;
+
     return tag;
 }
 
@@ -559,30 +573,51 @@ AsepriteTag GenAsepriteTagDefault() {
  */
 AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index) {
     AsepriteTag tag = GenAsepriteTagDefault();
+
+    // Ensure the Aseprite exists.
     ase_t* ase = aseprite.ase;
     if (ase == 0) {
         TraceLog(LOG_ERROR, "ASEPRITE: Asprite not loaded when attempting to load tag #%i", index);
         return tag;
     }
 
+    // Ensure the tag exists
     if (index < 0 || index >= ase->tag_count) {
         TraceLog(LOG_ERROR, "ASEPRITE: Tag index %i out of range for %i tags", index, ase->tag_count);
         return tag;
     }
 
+    // Base tag information
     tag.aseprite.ase = aseprite.ase;
     tag.tag = &ase->tags[index];
-    tag.currentFrame = tag.tag->from_frame;
+
+    // Set up the frame range
     tag.direction = 1;
+    tag.currentFrame = tag.tag->from_frame;
     if (tag.tag->loop_animation_direction == ASE_ANIMATION_DIRECTION_BACKWORDS) {
         tag.currentFrame = tag.tag->to_frame;
         tag.direction = -1;
     }
-    tag.timer = (float)(ase->frames[tag.currentFrame].duration_milliseconds) / 1000.0f; // Timer in seconds.
+
+    // Pause the animation if it's a one-frame tag
+    if (tag.tag->from_frame == tag.tag->to_frame) {
+        tag.paused = true;
+    }
+
+    // Timer in seconds
+    tag.timer = (float)(ase->frames[tag.currentFrame].duration_milliseconds) / 1000.0f;
+
+    // Color
     tag.color.r = (unsigned char)tag.tag->r;
     tag.color.g = (unsigned char)tag.tag->g;
     tag.color.b = (unsigned char)tag.tag->b;
+
+    // Name
     tag.name = (char*)tag.tag->name;
+
+    // Display a trace log about the aseprite tag
+    TraceLog(LOG_TRACE, "ASEPRITE: [ID %i] Asprite tag loaded successfully (%s)", index, tag.name);
+
     return tag;
 }
 
@@ -612,7 +647,9 @@ AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name) {
         }
     }
 
+    // Display a warning about the missing aseprite
     TraceLog(LOG_WARNING, "ASEPRITE: Could not find tag \"%s\"", name);
+
     return tag;
 }
 
