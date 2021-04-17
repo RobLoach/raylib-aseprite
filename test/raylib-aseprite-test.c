@@ -87,6 +87,10 @@ int main(int argc, char *argv[]) {
         DrawAsepriteTagEx(tag, (Vector2){10, 30}, 20, 3, WHITE);
         // DrawAsepriteTagPro()
         DrawAsepriteTagPro(tag, (Rectangle){30, 30, 20, 20}, (Vector2){0, 0}, 0.5f, WHITE);
+
+        // UpdateAsepriteTag()
+        UpdateAsepriteTag(&tag);
+        UpdateAsepriteTag(NULL);
     }
     EndDrawing();
 

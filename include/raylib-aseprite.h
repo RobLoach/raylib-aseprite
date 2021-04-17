@@ -33,40 +33,13 @@
 #define INCLUDE_RAYLIB_ASEPRITE_H_
 
 #include "raylib.h" // NOLINT
-#include "./cute_aseprite.h" // NOLINT
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * The loaded Aseprite data.
- *
- * @see LoadAseprite()
- * @see UnloadAseprite()
- */
-typedef struct Aseprite {
-    ase_t* ase;         // Pointer to the cute_aseprite data.
-} Aseprite;
-
-/**
- * Tag information from Aseprite.
- *
- * @see LoadAsepriteTag()
- * @see LoadAsepriteTagFromIndex()
- */
-typedef struct AsepriteTag {
-    char* name;         // The name of the tag.
-    int currentFrame;   // The frame that the tag is currently on
-    float timer;        // The countdown timer in seconds
-    int direction;      // Whether we are moving forwards, or backwards through the frames
-    float speed;        // The animation speed factor (1 is normal speed, 2 is double speed)
-    Color color;        // The color provided for the tag
-    bool loop;          // Whether to continue to play the animation when the animation finishes
-    bool paused;        // Set to true to not progression of the animation
-    Aseprite aseprite;  // The loaded Aseprite file
-    ase_tag_t* tag;     // The active tag to act upon
-} AsepriteTag;
+typedef struct Aseprite Aseprite;                                   // A loaded Aseprite file
+typedef struct AsepriteTag AsepriteTag;                             // A tag sprite animation within an Aseprite file
 
 // Aseprite functions
 Aseprite LoadAseprite(const char* fileName);                        // Load an .aseprite file
@@ -106,6 +79,10 @@ void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float r
 
 #ifndef CUTE_ASEPRITE_IMPLEMENTATION
 #define CUTE_ASEPRITE_IMPLEMENTATION
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 // Have cute_aseprite report warnings through raylib.
@@ -154,9 +131,34 @@ void raylib_aseprite_fclose(CUTE_ASEPRITE_FILE* fp) {
 
 #include "cute_aseprite.h" // NOLINT
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/**
+ * The loaded Aseprite data.
+ *
+ * @see LoadAseprite()
+ * @see UnloadAseprite()
+ */
+struct Aseprite {
+    ase_t* ase;         // Pointer to the cute_aseprite data.
+};
+
+/**
+ * Tag information from Aseprite.
+ *
+ * @see LoadAsepriteTag()
+ * @see LoadAsepriteTagFromIndex()
+ */
+struct AsepriteTag {
+    char* name;         // The name of the tag.
+    int currentFrame;   // The frame that the tag is currently on
+    float timer;        // The countdown timer in seconds
+    int direction;      // Whether we are moving forwards, or backwards through the frames
+    float speed;        // The animation speed factor (1 is normal speed, 2 is double speed)
+    Color color;        // The color provided for the tag
+    bool loop;          // Whether to continue to play the animation when the animation finishes
+    bool paused;        // Set to true to not progression of the animation
+    Aseprite aseprite;  // The loaded Aseprite file
+    ase_tag_t* tag;     // The active tag to act upon
+};
 
 /**
  * Load an .aseprite file through its memory data.
@@ -468,24 +470,22 @@ void UpdateAsepriteTag(AsepriteTag* tag) {
     // Advance the frame and see if it's time to reset the position.
     tag->currentFrame += tag->direction;
     switch (aseTag->loop_animation_direction) {
-        case ASE_ANIMATION_DIRECTION_BACKWORDS:
-            if (tag->currentFrame < aseTag->from_frame) {
-                if (tag->loop) {
-                    tag->currentFrame = aseTag->to_frame;
-                }
-                else {
-                    tag->currentFrame = aseTag->from_frame;
-                    tag->paused = true;
-                }
-            }
-        break;
         case ASE_ANIMATION_DIRECTION_FORWARDS:
             if (tag->currentFrame > aseTag->to_frame) {
                 if (tag->loop) {
                     tag->currentFrame = aseTag->from_frame;
-                }
-                else {
+                } else {
                     tag->currentFrame = aseTag->to_frame;
+                    tag->paused = true;
+                }
+            }
+        break;
+        case ASE_ANIMATION_DIRECTION_BACKWORDS:
+            if (tag->currentFrame < aseTag->from_frame) {
+                if (tag->loop) {
+                    tag->currentFrame = aseTag->to_frame;
+                } else {
+                    tag->currentFrame = aseTag->from_frame;
                     tag->paused = true;
                 }
             }
@@ -496,20 +496,17 @@ void UpdateAsepriteTag(AsepriteTag* tag) {
                     tag->direction = -1;
                     if (tag->loop) {
                         tag->currentFrame = aseTag->to_frame - 1;
-                    }
-                    else {
+                    } else {
                         tag->currentFrame = aseTag->to_frame;
                         tag->paused = true;
                     }
                 }
-            }
-            else {
+            } else {
                 if (tag->currentFrame < aseTag->from_frame) {
                     tag->direction = 1;
                     if (tag->loop) {
                         tag->currentFrame = aseTag->from_frame + 1;
-                    }
-                    else {
+                    } else {
                         tag->currentFrame = aseTag->from_frame;
                         tag->paused = true;
                     }
