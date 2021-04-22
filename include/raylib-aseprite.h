@@ -394,7 +394,7 @@ void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotati
 
     Rectangle source = {(float)(frame * ase->w), 0, (float)ase->w, (float)ase->h};
     Texture2D texture = GetAsepriteTexture(aseprite);
-    Rectangle dest = {(float)position.x, (float)position.y, (float)(ase->w * scale), (float)(ase->h * scale)};
+    Rectangle dest = {(float)position.x, (float)position.y, (float)ase->w * scale, (float)ase->h * scale};
     Vector2 origin = {0, 0};
     DrawTexturePro(texture, source, dest, origin, rotation, tint);           // Draw a part of a texture defined by a rectangle with 'pro' parameters
 }
