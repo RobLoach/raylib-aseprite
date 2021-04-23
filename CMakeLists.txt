@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.11)
 project (raylib-aseprite
-    VERSION 1.0.0
+    VERSION 1.0.1
     DESCRIPTION "raylib-aseprite"
     HOMEPAGE_URL "https://github.com/robloach/raylib-aseprite"
     LANGUAGES C)
