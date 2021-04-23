@@ -92,44 +92,36 @@ extern "C" {
 #define CUTE_ASEPRITE_ASSERT(condition) if (!(condition)) { TraceLog(LOG_WARNING, "ASEPRITE: Failed assert \"%s\" in %s:%i", #condition, __FILE__, __LINE__); }
 
 // Override how Cute attempts to load files.
-#define CUTE_ASEPRITE_FILEIO
+#ifndef CUTE_ASEPRITE_STDIO
+#define CUTE_ASEPRITE_STDIO
 #define CUTE_ASEPRITE_SEEK_SET 0
 #define CUTE_ASEPRITE_SEEK_END 0
 #define CUTE_ASEPRITE_FILE void
-CUTE_ASEPRITE_FILE* raylib_aseprite_fopen(const char* file, const char* property) {
-    (void)file;
-    (void)property;
-    return 0;
-}
-void raylib_aseprite_fseek(CUTE_ASEPRITE_FILE* fp, int sz, int pos) {
-    (void)fp;
-    (void)sz;
-    (void)pos;
-}
-void raylib_aseprite_fread(char* data, int sz, int num, CUTE_ASEPRITE_FILE* fp) {
-    (void)data;
-    (void)sz;
-    (void)num;
-    (void)fp;
-}
-int raylib_aseprite_ftell(CUTE_ASEPRITE_FILE* fp) {
-    (void)fp;
-    return 0;
-}
-void raylib_aseprite_fclose(CUTE_ASEPRITE_FILE* fp) {
-    (void)fp;
-}
-#define CUTE_ASEPRITE_FOPEN raylib_aseprite_fopen
-#define CUTE_ASEPRITE_FSEEK raylib_aseprite_fseek
-#define CUTE_ASEPRITE_FREAD raylib_aseprite_fread
-#define CUTE_ASEPRITE_FTELL raylib_aseprite_ftell
-#define CUTE_ASEPRITE_FCLOSE raylib_aseprite_fclose
+#define CUTE_ASEPRITE_FOPEN(file, property) (0)
+#define CUTE_ASEPRITE_FSEEK(fp, sz, pos) TraceLog(LOG_ERROR, "ASEPRITE: fseek() was removed")
+#define CUTE_ASEPRITE_FREAD(data, sz, num, fp) TraceLog(LOG_ERROR, "ASEPRITE: fread() was removed")
+#define CUTE_ASEPRITE_FTELL(fp) (0)
+#define CUTE_ASEPRITE_FCLOSE(fp) TraceLog(LOG_ERROR, "ASEPRITE: fclose() was removed")
+#endif  // CUTE_ASEPRITE_STDIO
 
 // Have cute_aseprite use raylib's memory functions.
 #define CUTE_ASEPRITE_ALLOC(size, ctx) MemAlloc((int)(size))
 #define CUTE_ASEPRITE_FREE(mem, ctx) MemFree((void*)(mem))
 
+// Include cute_aseprite.h while ignoring the warnings.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "cute_aseprite.h" // NOLINT
+#pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 
 /**
  * The loaded Aseprite data.
@@ -553,7 +545,6 @@ AsepriteTag GenAsepriteTagDefault() {
     tag.loop = true;
     tag.paused = false;
     tag.name = 0;
-
     return tag;
 }
 
