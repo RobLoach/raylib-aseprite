@@ -124,7 +124,7 @@ extern "C" {
 #pragma GCC diagnostic pop
 
 /**
- * The loaded Aseprite data.
+ * Aseprite object containing a pointer to the ase_t* from cute_aseprite.h.
  *
  * @see LoadAseprite()
  * @see UnloadAseprite()
@@ -134,7 +134,7 @@ struct Aseprite {
 };
 
 /**
- * Tag information from Aseprite.
+ * Tag information from an Aseprite object.
  *
  * @see LoadAsepriteTag()
  * @see LoadAsepriteTagFromIndex()
@@ -272,8 +272,8 @@ bool IsAsepriteReady(Aseprite aseprite) {
  */
 inline Texture GetAsepriteTexture(Aseprite aseprite) {
     if (aseprite.ase == 0) {
-        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get Texture from non-existant aseprite");
         struct Texture texture;
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get Texture from non-existant aseprite");
         texture.id = 0;
         texture.width = 0;
         texture.height = 0;
@@ -508,7 +508,7 @@ void UpdateAsepriteTag(AsepriteTag* tag) {
     }
 
     // Reset the timer.
-    // TODO: Add the original tag->timer to make up the different in frame time?
+    // TODO(RobLoach): Add the original tag->timer to make up the different in frame time?
     tag->timer = (float)(ase->frames[tag->currentFrame].duration_milliseconds) / 1000.0f /* + tag->timer; */;
 }
 
