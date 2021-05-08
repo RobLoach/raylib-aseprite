@@ -92,9 +92,45 @@ int main(int argc, char *argv[]) {
 
         // UpdateAsepriteTag()
         UpdateAsepriteTag(&tag);
-        UpdateAsepriteTag(NULL);
+        UpdateAsepriteTag(NULL); // Expect warning
     }
     EndDrawing();
+
+    // GetAsepriteSliceCount()
+    assert(GetAsepriteSliceCount(aseprite) == 2);
+
+    // LoadAsperiteSlice()
+    {
+        AsepriteSlice slice = LoadAsperiteSlice(aseprite, "Label");
+        assert(slice.bounds.x > 20);
+        assert(TextIsEqual(slice.name, "Label"));
+        assert(slice.bounds.y > 20);
+        assert(slice.bounds.width > 2);
+        assert(slice.bounds.height > 2);
+    }
+
+    // LoadAsperiteSliceFromIndex
+    {
+        AsepriteSlice slice = LoadAsperiteSliceFromIndex(aseprite, 1);
+        assert(TextIsEqual(slice.name, "Number"));
+    }
+
+    // IsAsepriteSliceReady
+    {
+        AsepriteSlice slice = LoadAsperiteSliceFromIndex(aseprite, 0);
+        assert(IsAsepriteSliceReady(slice));
+
+        AsepriteSlice noSlice;
+        noSlice.name = "";
+        assert(!IsAsepriteSliceReady(noSlice));
+
+        noSlice = LoadAsperiteSliceFromIndex(aseprite, 100);
+        assert(!IsAsepriteSliceReady(noSlice));
+    }
+
+    // GenAsepriteSliceDefault
+    AsepriteSlice defaultSlice = GenAsepriteSliceDefault();
+    assert(TextLength(defaultSlice.name) == 0);
 
     // UnloadAseprite()
     UnloadAseprite(aseprite);

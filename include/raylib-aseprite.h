@@ -71,8 +71,6 @@ void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float r
 // Aseprite Slice functions
 AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name);
 AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index);
-AsepriteSlice LoadAsperiteSliceFromFrameName(Aseprite aseprite, int frame, const char* name);
-AsepriteSlice LoadAsperiteSliceFromFrame(Aseprite aseprite, int frame);
 int GetAsepriteSliceCount(Aseprite aseprite);
 bool IsAsepriteSliceReady(AsepriteSlice slice);
 AsepriteSlice GenAsepriteSliceDefault();
@@ -668,6 +666,10 @@ bool IsAsepriteTagReady(AsepriteTag tag) {
 }
 
 AsepriteSlice LoadAsperiteSlice(Aseprite aseprite, const char* name) {
+    if (aseprite.ase == NULL) {
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot load slice on empty aseprite");
+        return GenAsepriteSliceDefault();
+    }
     for (int i = 0; i < aseprite.ase->slice_count; i++) {
         ase_slice_t* slice = &aseprite.ase->slices[i];
         if (TextIsEqual(name, slice->name)) {
@@ -678,38 +680,18 @@ AsepriteSlice LoadAsperiteSlice(Aseprite aseprite, const char* name) {
     return GenAsepriteSliceDefault();
 }
 
-AsepriteSlice LoadAsperiteSliceFromFrameName(Aseprite aseprite, int frame, const char* name) {
-    for (int i = 0; i < aseprite.ase->slice_count; i++) {
-        ase_slice_t* slice = &aseprite.ase->slices[i];
-        if (TextIsEqual(name, slice->name) && slice->frame_number == frame) {
-            return LoadAsperiteSliceFromIndex(aseprite, i);
-        }
-    }
-
-    return GenAsepriteSliceDefault();
-}
-
-AsepriteSlice LoadAsperiteSliceFromFrame(Aseprite aseprite, int frame) {
-    for (int i = 0; i < aseprite.ase->slice_count; i++) {
-        ase_slice_t* slice = &aseprite.ase->slices[i];
-        if (slice->frame_number == frame) {
-            return LoadAsperiteSliceFromIndex(aseprite, i);
-        }
-    }
-
-    return GenAsepriteSliceDefault();
-}
-
 AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index) {
+    if (aseprite.ase == NULL) {
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot load slice index from empty aseprite");
+        return GenAsepriteSliceDefault();
+    }
     if (index < aseprite.ase->slice_count) {
         AsepriteSlice output;
         ase_slice_t* slice = &aseprite.ase->slices[index];
-        output.bounds = (Rectangle){
-            (float)slice->origin_x,
-            (float)slice->origin_y,
-            (float)slice->w,
-            (float)slice->h
-        };
+        output.bounds.x = (float)slice->origin_x;
+        output.bounds.y = (float)slice->origin_y;
+        output.bounds.width = (float)slice->w;
+        output.bounds.height = (float)slice->h;
         output.name = (char*)slice->name;
         return output;
     }
@@ -729,7 +711,7 @@ int GetAsepriteSliceCount(Aseprite aseprite) {
 }
 
 bool IsAsepriteSliceReady(AsepriteSlice slice) {
-    return slice.name != (char*)0;
+    return TextLength(slice.name) != 0;
 }
 
 #ifdef __cplusplus

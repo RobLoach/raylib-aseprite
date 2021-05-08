@@ -75,7 +75,6 @@ void TraceAseprite(Aseprite aseprite);                              // Display a
 Texture GetAsepriteTexture(Aseprite aseprite);                      // Retrieve the raylib texture associated with the aseprite
 int GetAsepriteWidth(Aseprite aseprite);                            // Get the width of the sprite
 int GetAsepriteHeight(Aseprite aseprite);                           // Get the height of the sprite
-int GetAsepriteTagCount(Aseprite aseprite);                         // Get the total amount of available tags
 void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint);
 void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint);
 void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint);
@@ -84,6 +83,7 @@ void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origi
 // Aseprite Tag functions
 AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name);   // Load an Aseprite tag animation sequence
 AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index); // Load an Aseprite tag animation sequence from its index
+int GetAsepriteTagCount(Aseprite aseprite);                         // Get the total amount of available tags
 bool IsAsepriteTagReady(AsepriteTag tag);                           // Check if the given Aseprite tag was loaded successfully
 void UpdateAsepriteTag(AsepriteTag* tag);                           // Update the tag animation frame
 AsepriteTag GenAsepriteTagDefault();                                // Generate an empty Tag with sane defaults
@@ -91,6 +91,13 @@ void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint);
 void DrawAsepriteTagV(AsepriteTag tag, Vector2 position, Color tint);
 void DrawAsepriteTagEx(AsepriteTag tag, Vector2 position, float rotation, float scale, Color tint);
 void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, Color tint);
+
+// Aseprite Slice functions
+AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name);
+AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index);
+int GetAsepriteSliceCount(Aseprite aseprite);
+bool IsAsepriteSliceReady(AsepriteSlice slice);
+AsepriteSlice GenAsepriteSliceDefault();
 ```
 
 ## Development
