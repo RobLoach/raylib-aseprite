@@ -21,52 +21,54 @@ int main(int argc, char *argv[]) {
     assert(ChangeDirectory(dir));
 
     // LoadAseprite()
-    Aseprite aseprite = LoadAseprite("resources/backpacker.aseprite");
+    Aseprite aseprite = LoadAseprite("resources/numbers.aseprite");
     assert(aseprite.ase != NULL);
-    assert(aseprite.ase->frame_count > 5);
+    assert(aseprite.ase->frame_count > 20);
+    assert(aseprite.ase->frame_count < 40);
 
     // IsAsepriteReady()
     assert(IsAsepriteReady(aseprite));
 
     // GetAsepriteWidth()
-    assert(GetAsepriteWidth(aseprite) > 5);
+    assert(GetAsepriteWidth(aseprite) == 64);
 
     // GetAsepriteHeight()
-    assert(GetAsepriteHeight(aseprite) > 10);
+    assert(GetAsepriteHeight(aseprite) == 64);
 
     // GetAsepriteTagCount()
-    assert(GetAsepriteTagCount(aseprite) > 2);
+    assert(GetAsepriteTagCount(aseprite) == 3);
 
     // TraceAseprite()
     TraceAseprite(aseprite);
 
+    // GetAsepriteTagCount()
+    assert(GetAsepriteTagCount(aseprite) == 3);
+
     // LoadAsepriteTag()
-    AsepriteTag tag = LoadAsepriteTag(aseprite, "Walk Down");
+    AsepriteTag tag = LoadAsepriteTag(aseprite, "Backwards");
     assert(tag.timer > 0);
-    assert(tag.color.r == (BLACK).r);
-    assert(tag.color.g == (BLACK).g);
-    assert(tag.color.b == (BLACK).b);
-    assert(tag.color.a == (BLACK).a);
-    assert(TextIsEqual(tag.name, "Walk Down"));
+    Color expected = (Color){0, 135, 81, 255};
+    assert(tag.color.r == expected.r);
+    assert(tag.color.g == expected.g);
+    assert(tag.color.b == expected.b);
+    assert(tag.color.a == expected.a);
+    assert(TextIsEqual(tag.name, "Backwards"));
 
     // IsAsepriteTagReady()
     assert(IsAsepriteTagReady(tag));
-
-    // GetAsepriteTagCount()
-    assert(GetAsepriteTagCount(aseprite) > 2);
 
     // LoadAsepriteTagFromIndex()
     {
         AsepriteTag tag2 = LoadAsepriteTagFromIndex(aseprite, 2);
         assert(tag2.speed == 1.0f);
-        assert(tag2.currentFrame == 17);
-        assert(TextIsEqual(tag2.name, "Walk Up"));
+        assert(tag2.currentFrame == 20);
+        assert(TextIsEqual(tag2.name, "Ping-Pong"));
     }
 
     // GetAsepriteTexture()
     Texture texture = GetAsepriteTexture(aseprite);
-    assert(texture.width > 2);
-    assert(texture.height > 2);
+    assert(texture.width > 50);
+    assert(texture.height > 50);
 
     BeginDrawing();
     {
