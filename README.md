@@ -96,11 +96,11 @@ void DrawAsepriteTagEx(AsepriteTag tag, Vector2 position, float rotation, float 
 void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, Color tint);
 
 // Aseprite Slice functions
-AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name);
-AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index);
-int GetAsepriteSliceCount(Aseprite aseprite);
-bool IsAsepriteSliceReady(AsepriteSlice slice);
-AsepriteSlice GenAsepriteSliceDefault();
+AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name);   // Load a slice from an Aseprite based on its name.
+AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index); // Load a slice from an Aseprite based on its index.
+int GetAsepriteSliceCount(Aseprite aseprite);                       // Get the amount of slices that are defined in the Aseprite.
+bool IsAsepriteSliceReady(AsepriteSlice slice);                     // Return whether or not the given slice was found.
+AsepriteSlice GenAsepriteSliceDefault();                            // Generate empty Aseprite slice data.
 ```
 
 ## Development
