@@ -160,9 +160,15 @@ struct AsepriteTag {
     ase_tag_t* tag;     // The active tag to act upon
 };
 
+/**
+ * Slice data for the Aseprite.
+ *
+ * @see LoadAsepriteSlice()
+ * @see https://www.aseprite.org/docs/slices/
+ */
 struct AsepriteSlice {
-    char* name;
-    Rectangle bounds;
+    char* name;         // The name of the slice.
+    Rectangle bounds;   // The rectangle outer bounds for the slice.
 };
 
 /**
