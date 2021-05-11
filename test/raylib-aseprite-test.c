@@ -109,13 +109,13 @@ int main(int argc, char *argv[]) {
         assert(slice.bounds.height > 2);
     }
 
-    // LoadAsperiteSliceFromIndex
+    // LoadAsperiteSliceFromIndex()
     {
         AsepriteSlice slice = LoadAsperiteSliceFromIndex(aseprite, 1);
         assert(TextIsEqual(slice.name, "Number"));
     }
 
-    // IsAsepriteSliceReady
+    // IsAsepriteSliceReady()
     {
         AsepriteSlice slice = LoadAsperiteSliceFromIndex(aseprite, 0);
         assert(IsAsepriteSliceReady(slice));
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
         assert(!IsAsepriteSliceReady(noSlice));
     }
 
-    // GenAsepriteSliceDefault
+    // GenAsepriteSliceDefault()
     AsepriteSlice defaultSlice = GenAsepriteSliceDefault();
     assert(TextLength(defaultSlice.name) == 0);
 

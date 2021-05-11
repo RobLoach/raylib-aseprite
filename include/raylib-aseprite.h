@@ -665,6 +665,13 @@ bool IsAsepriteTagReady(AsepriteTag tag) {
     return tag.tag != 0;
 }
 
+/**
+ * Find a slice from an Aseprite based on its name.
+ *
+ * @param name The name of the slice to find.
+ *
+ * @return The loaded slice, or an empty one if not found.
+ */
 AsepriteSlice LoadAsperiteSlice(Aseprite aseprite, const char* name) {
     if (aseprite.ase == NULL) {
         TraceLog(LOG_WARNING, "ASEPRITE: Cannot load slice on empty aseprite");
@@ -680,6 +687,13 @@ AsepriteSlice LoadAsperiteSlice(Aseprite aseprite, const char* name) {
     return GenAsepriteSliceDefault();
 }
 
+/**
+ * Find a slice from an Aseprite based on its index.
+ *
+ * @param index The index of the slice to load.
+ *
+ * @return The loaded slice, or an empty one if not found.
+ */
 AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index) {
     if (aseprite.ase == NULL) {
         TraceLog(LOG_WARNING, "ASEPRITE: Cannot load slice index from empty aseprite");
