@@ -69,11 +69,11 @@ void DrawAsepriteTagEx(AsepriteTag tag, Vector2 position, float rotation, float 
 void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, Color tint);
 
 // Aseprite Slice functions
-AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name);
-AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index);
-int GetAsepriteSliceCount(Aseprite aseprite);
-bool IsAsepriteSliceReady(AsepriteSlice slice);
-AsepriteSlice GenAsepriteSliceDefault();
+AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name);   // Load a slice from an Aseprite based on its name.
+AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index); // Load a slice from an Aseprite based on its index.
+int GetAsepriteSliceCount(Aseprite aseprite);                       // Get the amount of slices that are defined in the Aseprite.
+bool IsAsepriteSliceReady(AsepriteSlice slice);                     // Return whether or not the given slice was found.
+AsepriteSlice GenAsepriteSliceDefault();                            // Generate empty Aseprite slice data.
 
 #ifdef __cplusplus
 }
@@ -666,13 +666,13 @@ bool IsAsepriteTagReady(AsepriteTag tag) {
 }
 
 /**
- * Find a slice from an Aseprite based on its name.
+ * Load a slice from an Aseprite based on its name.
  *
  * @param name The name of the slice to find.
  *
  * @return The loaded slice, or an empty one if not found.
  */
-AsepriteSlice LoadAsperiteSlice(Aseprite aseprite, const char* name) {
+AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name) {
     if (aseprite.ase == NULL) {
         TraceLog(LOG_WARNING, "ASEPRITE: Cannot load slice on empty aseprite");
         return GenAsepriteSliceDefault();
@@ -688,7 +688,7 @@ AsepriteSlice LoadAsperiteSlice(Aseprite aseprite, const char* name) {
 }
 
 /**
- * Find a slice from an Aseprite based on its index.
+ * Load a slice from an Aseprite based on its index.
  *
  * @param index The index of the slice to load.
  *
@@ -713,6 +713,9 @@ AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index) {
     return GenAsepriteSliceDefault();
 }
 
+/**
+ * Generate empty Aseprite slice data.
+ */
 AsepriteSlice GenAsepriteSliceDefault() {
     AsepriteSlice slice;
     slice.name = "";
@@ -720,10 +723,18 @@ AsepriteSlice GenAsepriteSliceDefault() {
     return slice;
 }
 
+/**
+ * Get the amount of slices that are defined in the Aseprite.
+ *
+ * @return The amount of slices.
+ */
 int GetAsepriteSliceCount(Aseprite aseprite) {
     return aseprite.ase->slice_count;
 }
 
+/**
+ * Return whether or not the given slice was found.
+ */
 bool IsAsepriteSliceReady(AsepriteSlice slice) {
     return TextLength(slice.name) != 0;
 }

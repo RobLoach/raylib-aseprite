@@ -2,7 +2,7 @@
 
 Load [Aseprite](https://www.aseprite.org) `.aseprite` files for animated sprites in [raylib](https://www.raylib.com).
 
-![examples/raylib-aseprite-example.png](examples/raylib-aseprite-example.png)
+![examples/raylib-aseprite-example.gif](examples/raylib-aseprite-example.gif)
 
 ## Features
 
@@ -13,12 +13,15 @@ Load [Aseprite](https://www.aseprite.org) `.aseprite` files for animated sprites
 - Adjust tag animation speed by using `tag.speed`
 - Pause tag animations by using `tag.pause`
 - Toggle whether animations will continue when they finish with `tag.loop`
+- Load [Aseprite slice](https://www.aseprite.org/docs/slices/) rectangles for collisions and bounds
 
 ## Usage
 
 This is a header-only library. To use it, define `RAYLIB_ASEPRITE_IMPLEMENTATION` in one .c source file before including [*raylib-aseprite.h*](include). You will also have to link the raylib dependency.
 
 ### Example
+
+The below is a basic example, see the [examples](examples) folder for more.
 
 ``` c
 #include "raylib.h"

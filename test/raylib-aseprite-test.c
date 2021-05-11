@@ -99,9 +99,9 @@ int main(int argc, char *argv[]) {
     // GetAsepriteSliceCount()
     assert(GetAsepriteSliceCount(aseprite) == 2);
 
-    // LoadAsperiteSlice()
+    // LoadAsepriteSlice()
     {
-        AsepriteSlice slice = LoadAsperiteSlice(aseprite, "Label");
+        AsepriteSlice slice = LoadAsepriteSlice(aseprite, "Label");
         assert(slice.bounds.x > 20);
         assert(TextIsEqual(slice.name, "Label"));
         assert(slice.bounds.y > 20);
