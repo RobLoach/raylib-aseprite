@@ -2,7 +2,7 @@
 
 Load [Aseprite](https://www.aseprite.org) `.aseprite` files for animated sprites in [raylib](https://www.raylib.com).
 
-![examples/raylib-aseprite-example.png](examples/raylib-aseprite-example.png)
+![examples/raylib-aseprite-example.gif](examples/raylib-aseprite-example.gif)
 
 ## Features
 
@@ -13,12 +13,15 @@ Load [Aseprite](https://www.aseprite.org) `.aseprite` files for animated sprites
 - Adjust tag animation speed by using `tag.speed`
 - Pause tag animations by using `tag.pause`
 - Toggle whether animations will continue when they finish with `tag.loop`
+- Load [Aseprite slice](https://www.aseprite.org/docs/slices/) rectangles for collisions and bounds
 
 ## Usage
 
 This is a header-only library. To use it, define `RAYLIB_ASEPRITE_IMPLEMENTATION` in one .c source file before including [*raylib-aseprite.h*](include). You will also have to link the raylib dependency.
 
 ### Example
+
+The below is a basic example, see the [examples](examples) folder for more.
 
 ``` c
 #include "raylib.h"
@@ -75,7 +78,6 @@ void TraceAseprite(Aseprite aseprite);                              // Display a
 Texture GetAsepriteTexture(Aseprite aseprite);                      // Retrieve the raylib texture associated with the aseprite
 int GetAsepriteWidth(Aseprite aseprite);                            // Get the width of the sprite
 int GetAsepriteHeight(Aseprite aseprite);                           // Get the height of the sprite
-int GetAsepriteTagCount(Aseprite aseprite);                         // Get the total amount of available tags
 void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint);
 void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint);
 void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint);
@@ -84,6 +86,7 @@ void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origi
 // Aseprite Tag functions
 AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name);   // Load an Aseprite tag animation sequence
 AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index); // Load an Aseprite tag animation sequence from its index
+int GetAsepriteTagCount(Aseprite aseprite);                         // Get the total amount of available tags
 bool IsAsepriteTagReady(AsepriteTag tag);                           // Check if the given Aseprite tag was loaded successfully
 void UpdateAsepriteTag(AsepriteTag* tag);                           // Update the tag animation frame
 AsepriteTag GenAsepriteTagDefault();                                // Generate an empty Tag with sane defaults
@@ -91,6 +94,13 @@ void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint);
 void DrawAsepriteTagV(AsepriteTag tag, Vector2 position, Color tint);
 void DrawAsepriteTagEx(AsepriteTag tag, Vector2 position, float rotation, float scale, Color tint);
 void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, Color tint);
+
+// Aseprite Slice functions
+AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name);   // Load a slice from an Aseprite based on its name.
+AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index); // Load a slice from an Aseprite based on its index.
+int GetAsepriteSliceCount(Aseprite aseprite);                       // Get the amount of slices that are defined in the Aseprite.
+bool IsAsepriteSliceReady(AsepriteSlice slice);                     // Return whether or not the given slice was found.
+AsepriteSlice GenAsepriteSliceDefault();                            // Generate empty Aseprite slice data.
 ```
 
 ## Development

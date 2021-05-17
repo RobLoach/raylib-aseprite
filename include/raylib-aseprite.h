@@ -40,6 +40,7 @@ extern "C" {
 
 typedef struct Aseprite Aseprite;                                   // A loaded Aseprite file
 typedef struct AsepriteTag AsepriteTag;                             // A tag sprite animation within an Aseprite file
+typedef struct AsepriteSlice AsepriteSlice;                         // A slice is a defined region within the Asperite.
 
 // Aseprite functions
 Aseprite LoadAseprite(const char* fileName);                        // Load an .aseprite file
@@ -50,7 +51,6 @@ void TraceAseprite(Aseprite aseprite);                              // Display a
 Texture GetAsepriteTexture(Aseprite aseprite);                      // Retrieve the raylib texture associated with the aseprite
 int GetAsepriteWidth(Aseprite aseprite);                            // Get the width of the sprite
 int GetAsepriteHeight(Aseprite aseprite);                           // Get the height of the sprite
-int GetAsepriteTagCount(Aseprite aseprite);                         // Get the total amount of available tags
 void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint);
 void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint);
 void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint);
@@ -59,6 +59,7 @@ void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origi
 // Aseprite Tag functions
 AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name);   // Load an Aseprite tag animation sequence
 AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index); // Load an Aseprite tag animation sequence from its index
+int GetAsepriteTagCount(Aseprite aseprite);                         // Get the total amount of available tags
 bool IsAsepriteTagReady(AsepriteTag tag);                           // Check if the given Aseprite tag was loaded successfully
 void UpdateAsepriteTag(AsepriteTag* tag);                           // Update the tag animation frame
 AsepriteTag GenAsepriteTagDefault();                                // Generate an empty Tag with sane defaults
@@ -66,6 +67,13 @@ void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint);
 void DrawAsepriteTagV(AsepriteTag tag, Vector2 position, Color tint);
 void DrawAsepriteTagEx(AsepriteTag tag, Vector2 position, float rotation, float scale, Color tint);
 void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, Color tint);
+
+// Aseprite Slice functions
+AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name);   // Load a slice from an Aseprite based on its name.
+AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index); // Load a slice from an Aseprite based on its index.
+int GetAsepriteSliceCount(Aseprite aseprite);                       // Get the amount of slices that are defined in the Aseprite.
+bool IsAsepriteSliceReady(AsepriteSlice slice);                     // Return whether or not the given slice was found.
+AsepriteSlice GenAsepriteSliceDefault();                            // Generate empty Aseprite slice data.
 
 #ifdef __cplusplus
 }
@@ -150,6 +158,17 @@ struct AsepriteTag {
     bool paused;        // Set to true to not progression of the animation
     Aseprite aseprite;  // The loaded Aseprite file
     ase_tag_t* tag;     // The active tag to act upon
+};
+
+/**
+ * Slice data for the Aseprite.
+ *
+ * @see LoadAsepriteSlice()
+ * @see https://www.aseprite.org/docs/slices/
+ */
+struct AsepriteSlice {
+    char* name;         // The name of the slice.
+    Rectangle bounds;   // The rectangle outer bounds for the slice.
 };
 
 /**
@@ -650,6 +669,80 @@ AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name) {
  */
 bool IsAsepriteTagReady(AsepriteTag tag) {
     return tag.tag != 0;
+}
+
+/**
+ * Load a slice from an Aseprite based on its name.
+ *
+ * @param name The name of the slice to find.
+ *
+ * @return The loaded slice, or an empty one if not found.
+ */
+AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name) {
+    if (aseprite.ase == NULL) {
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot load slice on empty aseprite");
+        return GenAsepriteSliceDefault();
+    }
+    for (int i = 0; i < aseprite.ase->slice_count; i++) {
+        ase_slice_t* slice = &aseprite.ase->slices[i];
+        if (TextIsEqual(name, slice->name)) {
+            return LoadAsperiteSliceFromIndex(aseprite, i);
+        }
+    }
+
+    return GenAsepriteSliceDefault();
+}
+
+/**
+ * Load a slice from an Aseprite based on its index.
+ *
+ * @param index The index of the slice to load.
+ *
+ * @return The loaded slice, or an empty one if not found.
+ */
+AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index) {
+    if (aseprite.ase == NULL) {
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot load slice index from empty aseprite");
+        return GenAsepriteSliceDefault();
+    }
+    if (index < aseprite.ase->slice_count) {
+        AsepriteSlice output;
+        ase_slice_t* slice = &aseprite.ase->slices[index];
+        output.bounds.x = (float)slice->origin_x;
+        output.bounds.y = (float)slice->origin_y;
+        output.bounds.width = (float)slice->w;
+        output.bounds.height = (float)slice->h;
+        output.name = (char*)slice->name;
+        return output;
+    }
+
+    return GenAsepriteSliceDefault();
+}
+
+/**
+ * Generate empty Aseprite slice data.
+ */
+AsepriteSlice GenAsepriteSliceDefault() {
+    AsepriteSlice slice;
+    slice.name = "";
+    slice.bounds = (Rectangle){0, 0, 0, 0};
+    return slice;
+}
+
+/**
+ * Get the amount of slices that are defined in the Aseprite.
+ *
+ * @return The amount of slices.
+ */
+int GetAsepriteSliceCount(Aseprite aseprite) {
+    return aseprite.ase->slice_count;
+}
+
+/**
+ * Return whether or not the given slice was found.
+ */
+bool IsAsepriteSliceReady(AsepriteSlice slice) {
+    return TextLength(slice.name) != 0;
 }
 
 #ifdef __cplusplus
