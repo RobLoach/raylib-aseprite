@@ -1,6 +1,6 @@
 # raylib-aseprite
 
-Load [Aseprite](https://www.aseprite.org) `.aseprite` files for animated sprites in [raylib](https://www.raylib.com).
+Load [Aseprite](https://www.aseprite.org) **1.2** `.aseprite` files for animated sprites in [raylib](https://www.raylib.com).
 
 ![examples/raylib-aseprite-example.gif](examples/raylib-aseprite-example.gif)
 
