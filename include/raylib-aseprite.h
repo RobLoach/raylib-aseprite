@@ -207,8 +207,8 @@ Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
             .data = frame->pixels,
             .width = ase->w,
             .height = ase->h,
-            .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,
-            .mipmaps = 1
+            .mipmaps = 1,
+            .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
         };
         ImageDraw(&image, frameImage, src, dest, WHITE);
     }
@@ -218,10 +218,10 @@ Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
     if (transparency >= 0 && transparency < ase->palette.entry_count) {
         ase_color_t transparentColor = ase->palette.entries[transparency].color;
         Color source = {
-            .a = transparentColor.a,
             .r = transparentColor.r,
             .g = transparentColor.g,
-            .b = transparentColor.b
+            .b = transparentColor.b,
+            .a = transparentColor.a
         };
         ImageColorReplace(&image, source, BLANK);
     }
