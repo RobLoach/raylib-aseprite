@@ -2,3 +2,6 @@
 	path = vendor/raylib
 	url = https://github.com/raysan5/raylib.git
     ignore = dirty
+[submodule "vendor/cute_headers"]
+	path = vendor/cute_headers
+	url = https://github.com/RandyGaul/cute_headers.git
