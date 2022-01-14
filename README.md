@@ -103,6 +103,10 @@ bool IsAsepriteSliceReady(AsepriteSlice slice);                     // Return wh
 AsepriteSlice GenAsepriteSliceDefault();                            // Generate empty Aseprite slice data.
 ```
 
+## Known Issues
+
+* [#14](https://github.com/RobLoach/raylib-aseprite/issues/14) Supports only Aseprite 1.2. [`cute_aseprite.h`](https://github.com/RandyGaul/cute_headers/blob/master/cute_aseprite.h) does not yet support Aseprite 1.3, so make sure you're using 1.2.
+
 ## Development
 
 To build the example locally, and run tests, use [cmake](https://cmake.org/).
