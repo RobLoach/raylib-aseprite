@@ -1,7 +1,7 @@
-add_library(raylib-aseprite INTERFACE)
+add_library(raylib_aseprite INTERFACE)
 
 # Include Directory
-target_include_directories(raylib-aseprite INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/)
+target_include_directories(raylib_aseprite INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/)
 
 # Set the header files as install files.
 install(FILES
