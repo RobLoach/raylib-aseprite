@@ -33,6 +33,14 @@ target_link_libraries(raylib-aseprite-numbers PUBLIC
 )
 set_property(TARGET raylib-aseprite-numbers PROPERTY C_STANDARD 99)
 
+# raylib-aseprite-walk
+add_executable(raylib-aseprite-walk raylib-aseprite-walk.c)
+target_link_libraries(raylib-aseprite-walk PUBLIC
+    raylib
+    raylib_aseprite
+)
+set_property(TARGET raylib-aseprite-walk PROPERTY C_STANDARD 99)
+
 # Copy the resources
 file(GLOB resources resources/*)
 set(test_resources)

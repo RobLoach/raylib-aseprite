@@ -47,7 +47,7 @@ int main() {
         {
             ClearBackground(RAYWHITE);
 
-            // Draw the 0th frame from the George sprite.
+            // Draw the first frame from the George sprite.
             DrawAseprite(george, 0, 100, 100, WHITE);
 
             // Draw the Walk Down animation.
@@ -102,10 +102,6 @@ int GetAsepriteSliceCount(Aseprite aseprite);                       // Get the a
 bool IsAsepriteSliceReady(AsepriteSlice slice);                     // Return whether or not the given slice was found.
 AsepriteSlice GenAsepriteSliceDefault();                            // Generate empty Aseprite slice data.
 ```
-
-## Known Issues
-
-* [#14](https://github.com/RobLoach/raylib-aseprite/issues/14) Supports only Aseprite 1.2. [`cute_aseprite.h`](https://github.com/RandyGaul/cute_headers/blob/master/cute_aseprite.h) does not yet support Aseprite 1.3, so make sure you're using 1.2.
 
 ## Development
 
