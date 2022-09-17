@@ -96,40 +96,21 @@ extern "C" {
 // Have cute_aseprite report warnings through raylib.
 #define CUTE_ASEPRITE_WARNING(msg) TraceLog(LOG_WARNING, "ASEPRITE: %s (cute_headers.h:%i)", msg, __LINE__)
 
-// Have failed cute_aseprite assertions report an error through raylib.
-#define CUTE_ASEPRITE_ASSERT(condition) if (!(condition)) { TraceLog(LOG_WARNING, "ASEPRITE: Failed assert \"%s\" in %s:%i", #condition, __FILE__, __LINE__); }
+#define CUTE_ASEPRITE_ASSERT(condition) do { if (!(condition)) { TraceLog(LOG_WARNING, "ASEPRITE: Failed assert \"%s\" in %s:%i", #condition, __FILE__, __LINE__); } } while(0)
 
-// Override how Cute attempts to load files.
-#ifndef CUTE_ASEPRITE_STDIO
-#define CUTE_ASEPRITE_STDIO
+#define CUTE_ASEPRITE_ALLOC(size, ctx) MemAlloc((int)(size))
+#define CUTE_ASEPRITE_FREE(mem, ctx) MemFree((void*)(mem))
+
 #define CUTE_ASEPRITE_SEEK_SET 0
 #define CUTE_ASEPRITE_SEEK_END 0
 #define CUTE_ASEPRITE_FILE void
-#define CUTE_ASEPRITE_FOPEN(file, property) (0)
+#define CUTE_ASEPRITE_FOPEN(file, property) (CUTE_ASEPRITE_FILE*)file
 #define CUTE_ASEPRITE_FSEEK(fp, sz, pos) TraceLog(LOG_ERROR, "ASEPRITE: fseek() was removed")
 #define CUTE_ASEPRITE_FREAD(data, sz, num, fp) TraceLog(LOG_ERROR, "ASEPRITE: fread() was removed")
 #define CUTE_ASEPRITE_FTELL(fp) (0)
 #define CUTE_ASEPRITE_FCLOSE(fp) TraceLog(LOG_ERROR, "ASEPRITE: fclose() was removed")
-#endif  // CUTE_ASEPRITE_STDIO
 
-// Have cute_aseprite use raylib's memory functions.
-#define CUTE_ASEPRITE_ALLOC(size, ctx) MemAlloc((int)(size))
-#define CUTE_ASEPRITE_FREE(mem, ctx) MemFree((void*)(mem))
-
-// Include cute_aseprite.h while ignoring the warnings.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-conversion"
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-compare"
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "cute_aseprite.h" // NOLINT
-#pragma GCC diagnostic pop
-#pragma GCC diagnostic pop
-#pragma GCC diagnostic pop
-#pragma GCC diagnostic pop
 
 /**
  * Aseprite object containing a pointer to the ase_t* from cute_aseprite.h.

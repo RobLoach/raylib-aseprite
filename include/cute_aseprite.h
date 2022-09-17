@@ -347,16 +347,43 @@ struct ase_t
 	#define CUTE_ASEPRITE_ASSERT assert
 #endif
 
-#if !defined(CUTE_ASEPRITE_STDIO)
-	#include <stdio.h> // fopen
-	#define CUTE_ASEPRITE_STDIO
+#if !defined(CUTE_ASEPRITE_SEEK_SET)
+	#include <stdio.h> // SEEK_SET
 	#define CUTE_ASEPRITE_SEEK_SET SEEK_SET
+#endif
+
+#if !defined(CUTE_ASEPRITE_SEEK_END)
+	#include <stdio.h> // SEEK_END
 	#define CUTE_ASEPRITE_SEEK_END SEEK_END
+#endif
+
+#if !defined(CUTE_ASEPRITE_FILE)
+	#include <stdio.h> // FILE
 	#define CUTE_ASEPRITE_FILE FILE
+#endif
+
+#if !defined(CUTE_ASEPRITE_FOPEN)
+	#include <stdio.h> // fopen
 	#define CUTE_ASEPRITE_FOPEN fopen
+#endif
+
+#if !defined(CUTE_ASEPRITE_FSEEK)
+	#include <stdio.h> // fseek
 	#define CUTE_ASEPRITE_FSEEK fseek
+#endif
+
+#if !defined(CUTE_ASEPRITE_FREAD)
+	#include <stdio.h> // fread
 	#define CUTE_ASEPRITE_FREAD fread
+#endif
+
+#if !defined(CUTE_ASEPRITE_FTELL)
+	#include <stdio.h> // ftell
 	#define CUTE_ASEPRITE_FTELL ftell
+#endif
+
+#if !defined(CUTE_ASEPRITE_FCLOSE)
+	#include <stdio.h> // fclose
 	#define CUTE_ASEPRITE_FCLOSE fclose
 #endif
 
@@ -501,7 +528,7 @@ static uint32_t s_build(deflate_t* s, uint32_t* tree, uint8_t* lens, int sym_cou
 		first[n] = first[n - 1] + counts[n - 1];
 	}
 
-	for (int i = 0; i < sym_count; ++i)
+	for (uint32_t i = 0; i < (uint32_t)sym_count; ++i)
 	{
 		uint8_t len = lens[i];
 
@@ -529,7 +556,8 @@ static int s_stored(deflate_t* s)
 	// read LEN and NLEN, should complement each other
 	uint16_t LEN = (uint16_t)s_read_bits(s, 16);
 	uint16_t NLEN = (uint16_t)s_read_bits(s, 16);
-	CUTE_ASEPRITE_CHECK(LEN == (uint16_t)(~NLEN), "Failed to find LEN and NLEN as complements within stored (uncompressed) stream.");
+	uint16_t TILDE_NLEN = ~NLEN;
+	CUTE_ASEPRITE_CHECK(LEN == TILDE_NLEN, "Failed to find LEN and NLEN as complements within stored (uncompressed) stream.");
 	CUTE_ASEPRITE_CHECK(s->bits_left / 8 <= (int)LEN, "Stored block extends beyond end of input stream.");
 	p = s_ptr(s);
 	CUTE_ASEPRITE_MEMCPY(s->out, p, LEN);
@@ -656,7 +684,7 @@ static int s_inflate(const void* in, int in_bytes, void* out, int out_bytes, voi
 	s->bits_left = in_bytes * 8;
 
 	// s->words is the in-pointer rounded up to a multiple of 4
-	int first_bytes = (int)((((size_t)in + 3) & ~3) - (size_t)in);
+	int first_bytes = (int)((((size_t)in + 3) & (size_t)(~3)) - (size_t)in);
 	s->words = (uint32_t*)((char*)in + first_bytes);
 	s->word_count = (in_bytes - first_bytes) / 4;
 	int last_bytes = ((in_bytes - first_bytes) & 3);
@@ -770,8 +798,8 @@ static uint64_t s_read_uint64(ase_state_t* s)
 }
 #endif
 
-static int16_t s_read_int16(ase_state_t* s) { return (int16_t)s_read_uint16(s); }
-static int16_t s_read_int32(ase_state_t* s) { return (int32_t)s_read_uint32(s); }
+#define s_read_int16(s) (int16_t)s_read_uint16(s)
+#define s_read_int32(s) (int32_t)s_read_uint32(s)
 
 #ifdef CUTE_ASPRITE_S_READ_BYTES
 // s_read_bytes() is not currently used.
