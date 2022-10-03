@@ -47,8 +47,8 @@ int main() {
 
         // Update
         //----------------------------------------------------------------------------------
-        // Update the active moving animation.
 
+        // Update the active moving animation.
         if (IsKeyDown(KEY_UP)) {
             current = &up;
             position.y -= speed;
@@ -72,6 +72,13 @@ int main() {
         else {
             current->paused = true;
         }
+
+        // Have George stop walking with two feet on the ground.
+        if (current->paused) {
+            SetAsepriteTagFrame(current, 1);
+        }
+
+        // Update the animation.
         UpdateAsepriteTag(current);
 
         //----------------------------------------------------------------------------------
@@ -84,6 +91,9 @@ int main() {
 
             // Draw the current walking animation.
             DrawAsepriteTagEx(*current, position, 0, scale, WHITE);
+
+            const char* text = "Use arrow keys to walk";
+            DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 20) / 2, GetScreenHeight() - 80, 20, GRAY);
         }
         EndDrawing();
         //----------------------------------------------------------------------------------
