@@ -67,6 +67,8 @@ void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint);
 void DrawAsepriteTagV(AsepriteTag tag, Vector2 position, Color tint);
 void DrawAsepriteTagEx(AsepriteTag tag, Vector2 position, float rotation, float scale, Color tint);
 void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, Color tint);
+void SetAsepriteTagFrame(AsepriteTag* tag, int frameNumber);                           // Sets which frame the tag is currently displaying.
+int GetAsepriteTagFrame(AsepriteTag tag);
 
 // Aseprite Slice functions
 AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name);   // Load a slice from an Aseprite based on its name.
@@ -510,6 +512,35 @@ void UpdateAsepriteTag(AsepriteTag* tag) {
     // Reset the timer.
     // TODO(RobLoach): Add the original tag->timer to make up the different in frame time?
     tag->timer = (float)(ase->frames[tag->currentFrame].duration_milliseconds) / 1000.0f /* + tag->timer; */;
+}
+
+/**
+ * Set which frame the Aseprite tag is on.
+ *
+ * @param tag The Aseprite tag to modify.
+ * @param frameNumber Which frame to set the active tag to. If negative, will start from the end.
+ */
+void SetAsepriteTagFrame(AsepriteTag* tag, int frameNumber) {
+    // TODO: Need to attribute frame number for ASE_ANIMATION_DIRECTION_BACKWORDS?
+    if (frameNumber >= 0) {
+        tag->currentFrame = tag->tag->from_frame + frameNumber;
+    }
+    else {
+        tag->currentFrame = tag->tag->to_frame + frameNumber;
+    }
+
+    // Bounds
+    if (tag->currentFrame < tag->tag->from_frame) {
+        tag->currentFrame = tag->tag->from_frame;
+    }
+    else if (tag->currentFrame > tag->tag->to_frame) {
+        tag->currentFrame = tag->tag->to_frame;
+    }
+}
+
+int GetAsepriteTagFrame(AsepriteTag tag) {
+    // TODO: Need to attribute frame number for ASE_ANIMATION_DIRECTION_BACKWORDS?
+    return tag.currentFrame - tag.tag->from_frame;
 }
 
 void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint) {

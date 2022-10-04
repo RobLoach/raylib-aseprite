@@ -65,6 +65,19 @@ int main(int argc, char *argv[]) {
         assert(TextIsEqual(tag2.name, "Ping-Pong"));
     }
 
+    // SetAsepriteTagFrame()
+    {
+        AsepriteTag tag = LoadAsepriteTagFromIndex(aseprite, 2);
+        SetAsepriteTagFrame(&tag, 4);
+
+        int frame = GetAsepriteTagFrame(tag);
+        assert(frame == 4);
+
+        SetAsepriteTagFrame(&tag, -3);
+        frame = GetAsepriteTagFrame(tag);
+        assert(frame == 9 - 3);
+    }
+
     // GetAsepriteTexture()
     Texture texture = GetAsepriteTexture(aseprite);
     assert(texture.width > 50);
