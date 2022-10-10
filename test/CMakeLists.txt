@@ -14,4 +14,5 @@ list(APPEND test_resources ${resources})
 file(COPY ${test_resources} DESTINATION "resources/")
 
 # Set up the test
+list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
 add_test(NAME raylib-aseprite-test COMMAND raylib-aseprite-test)
