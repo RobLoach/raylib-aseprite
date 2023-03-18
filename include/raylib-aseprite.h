@@ -5,7 +5,7 @@
 *   Copyright 2021 Rob Loach (@RobLoach)
 *
 *   DEPENDENCIES:
-*       raylib https://www.raylib.com/
+*       raylib 4.2+ https://www.raylib.com/
 *
 *   LICENSE: zlib/libpng
 *
