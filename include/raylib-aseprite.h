@@ -217,7 +217,7 @@ Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
 
     // Save the texture as the Aseprite context.
     ase->mem_ctx = MemAlloc(sizeof(Texture2D));
-    Texture2D* texturePointer = ase->mem_ctx;
+    Texture2D* texturePointer = (Texture2D*)ase->mem_ctx;
     texturePointer->format = texture.format;
     texturePointer->id = texture.id;
     texturePointer->mipmaps = texture.mipmaps;
