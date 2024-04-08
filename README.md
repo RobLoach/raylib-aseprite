@@ -71,7 +71,7 @@ See the [examples directory](examples) for more demonstrations of how to use *ra
 ``` c
 // Aseprite functions
 Aseprite LoadAseprite(const char* fileName);                        // Load an .aseprite file
-Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size);  // Load an aseprite file from memory
+Aseprite LoadAsepriteFromMemory(unsigned char* fileData, int size);  // Load an aseprite file from memory
 bool IsAsepriteReady(Aseprite aseprite);                            // Check if the given Aseprite was loaded successfully
 void UnloadAseprite(Aseprite aseprite);                             // Unloads the aseprite file
 void TraceAseprite(Aseprite aseprite);                              // Display all information associated with the aseprite

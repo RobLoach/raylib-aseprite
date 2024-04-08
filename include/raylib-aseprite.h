@@ -5,7 +5,7 @@
 *   Copyright 2021 Rob Loach (@RobLoach)
 *
 *   DEPENDENCIES:
-*       raylib 4.2+ https://www.raylib.com/
+*       raylib 5.0+ https://www.raylib.com/
 *
 *   LICENSE: zlib/libpng
 *
@@ -44,7 +44,7 @@ typedef struct AsepriteSlice AsepriteSlice;                         // A slice i
 
 // Aseprite functions
 Aseprite LoadAseprite(const char* fileName);                        // Load an .aseprite file
-Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size);  // Load an aseprite file from memory
+Aseprite LoadAsepriteFromMemory(unsigned char* fileData, int size);  // Load an aseprite file from memory
 bool IsAsepriteReady(Aseprite aseprite);                            // Check if the given Aseprite was loaded successfully
 void UnloadAseprite(Aseprite aseprite);                             // Unloads the aseprite file
 void TraceAseprite(Aseprite aseprite);                              // Display all information associated with the aseprite
@@ -100,7 +100,7 @@ extern "C" {
 
 #define CUTE_ASEPRITE_ASSERT(condition) do { if (!(condition)) { TraceLog(LOG_WARNING, "ASEPRITE: Failed assert \"%s\" in %s:%i", #condition, __FILE__, __LINE__); } } while(0)
 
-#define CUTE_ASEPRITE_ALLOC(size, ctx) MemAlloc((int)(size))
+#define CUTE_ASEPRITE_ALLOC(size, ctx) MemAlloc((unsigned int)(size))
 #define CUTE_ASEPRITE_FREE(mem, ctx) MemFree((void*)(mem))
 
 #define CUTE_ASEPRITE_SEEK_SET 0
@@ -163,7 +163,7 @@ struct AsepriteSlice {
  * @see UnloadAseprite()
  * @see LoadAseprite()
  */
-Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
+Aseprite LoadAsepriteFromMemory(unsigned char* fileData, int size) {
     struct Aseprite aseprite;
     aseprite.ase = 0;
 
@@ -240,7 +240,7 @@ Aseprite LoadAsepriteFromMemory(unsigned char* fileData, unsigned int size) {
  * @see IsAsepriteReady()
  */
 Aseprite LoadAseprite(const char* fileName) {
-    unsigned int bytesRead;
+    int bytesRead;
     unsigned char* fileData = LoadFileData(fileName, &bytesRead);
     if (bytesRead == 0 || fileData == 0) {
         TraceLog(LOG_ERROR, "ASEPRITE: Failed to load aseprite file \"%s\"", fileName);

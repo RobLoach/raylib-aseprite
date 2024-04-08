@@ -3,7 +3,7 @@
 		Licensing information can be found at the end of the file.
 	------------------------------------------------------------------------------
 
-	cute_aseprite.h - v1.02
+	cute_aseprite.h - v1.04
 
 	To create implementation (the function definitions)
 		#define CUTE_ASEPRITE_IMPLEMENTATION
@@ -45,6 +45,8 @@
 		1.01 (08/31/2020) fixed memleaks, tag parsing bug (crash), blend bugs
 		1.02 (02/05/2022) fixed icc profile parse bug, support transparent pal-
 		                  ette index, can parse 1.3 files (no tileset support)
+		1.03 (11/27/2023) fixed slice pivot parse bug
+  		1.04 (02/20/2024) chunck 0x0004 support
 */
 
 /*
@@ -212,6 +214,7 @@ struct ase_tag_t
 	int from_frame;
 	int to_frame;
 	ase_animation_direction_t loop_animation_direction;
+	int repeat;
 	uint8_t r, g, b;
 	const char* name;
 	ase_udata_t udata;
@@ -991,6 +994,30 @@ ase_t* cute_aseprite_load_from_memory(const void* memory, int size, void* mem_ct
 			uint8_t* chunk_start = s->in;
 
 			switch (chunk_type) {
+			case 0x0004: // Old Palette chunk (used when there are no colors with alpha in the palette)
+			{
+				int nbPackets = (int)s_read_uint16(s);
+				for (int k = 0; k < nbPackets ; k++ ) {
+					uint16_t maxColor=0;
+					uint8_t skip = s_read_uint8(s);
+					uint16_t nbColors = s_read_uint8(s);
+					if (nbColors == 0) nbColors = 256;
+
+					for (int l = 0; l < nbColors; l++) {
+						ase_palette_entry_t entry;
+						entry.color.r = s_read_uint8(s);
+						entry.color.g = s_read_uint8(s);
+						entry.color.b = s_read_uint8(s);
+						entry.color.a = 255;
+						entry.color_name = NULL;
+						ase->palette.entries[skip+l] = entry;
+						if (skip+l > maxColor) maxColor = skip+l;
+					}
+
+					ase->palette.entry_count = maxColor+1;
+				}
+
+			}	break;
 			case 0x2004: // Layer chunk.
 			{
 				CUTE_ASEPRITE_ASSERT(ase->layer_count < CUTE_ASEPRITE_MAX_LAYERS);
@@ -1099,7 +1126,8 @@ ase_t* cute_aseprite_load_from_memory(const void* memory, int size, void* mem_ct
 					tag.from_frame = (int)s_read_uint16(s);
 					tag.to_frame = (int)s_read_uint16(s);
 					tag.loop_animation_direction = (ase_animation_direction_t)s_read_uint8(s);
-					s_skip(s, 8); // For future (set to zero).
+					tag.repeat = s_read_uint16(s);
+					s_skip(s, 6); // For future (set to zero).
 					tag.r = s_read_uint8(s);
 					tag.g = s_read_uint8(s);
 					tag.b = s_read_uint8(s);
@@ -1176,7 +1204,8 @@ ase_t* cute_aseprite_load_from_memory(const void* memory, int size, void* mem_ct
 						slice.center_y = (int)s_read_int32(s);
 						slice.center_w = (int)s_read_uint32(s);
 						slice.center_h = (int)s_read_uint32(s);
-					} else if (flags & 2) {
+					}
+					if (flags & 2) {
 						// Has pivot information.
 						slice.has_pivot = 1;
 						slice.pivot_x = (int)s_read_int32(s);
