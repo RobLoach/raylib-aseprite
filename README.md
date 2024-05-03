@@ -2,6 +2,7 @@
 
 Load [Aseprite](https://www.aseprite.org) `.aseprite` and `.ase` files for animated sprites in [raylib](https://www.raylib.com).
 
+![examples/raylib-aseprite-aseprite.png](examples/raylib-aseprite-aseprite.png)
 ![examples/raylib-aseprite-example.gif](examples/raylib-aseprite-example.gif)
 
 ## Features
