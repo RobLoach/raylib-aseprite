@@ -89,9 +89,12 @@ Texture GetAsepriteTexture(Aseprite aseprite);                      // Retrieve 
 int GetAsepriteWidth(Aseprite aseprite);                            // Get the width of the sprite
 int GetAsepriteHeight(Aseprite aseprite);                           // Get the height of the sprite
 void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint);
+void DrawAsepriteFlipped(Aseprite aseprite, int frame, int posX, int posY, bool horizontalFlip, bool verticalFlip, Color tint);
 void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint);
-void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint);
+void DrawAsepriteVFlipped(Aseprite aseprite, int frame, Vector2 position, bool horizontalFlip, bool verticalFlip, Color tint);
+void DrawAsepriteExFlipped(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, bool horizontalFlip, bool verticalFlip, Color tint);
 void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint);
+void DrawAsepriteProFlipped(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, bool horizontalFlip, bool verticalFlip, Color tint);
 
 // Aseprite Tag functions
 AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name);   // Load an Aseprite tag animation sequence
@@ -101,9 +104,13 @@ bool IsAsepriteTagReady(AsepriteTag tag);                           // Check if 
 void UpdateAsepriteTag(AsepriteTag* tag);                           // Update the tag animation frame
 AsepriteTag GenAsepriteTagDefault();                                // Generate an empty Tag with sane defaults
 void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint);
+void DrawAsepriteTagFlipped(AsepriteTag tag, int posX, int posY, bool horizontalFlip, bool verticalFlip, Color tint);
 void DrawAsepriteTagV(AsepriteTag tag, Vector2 position, Color tint);
+void DrawAsepriteTagVFlipped(AsepriteTag tag, Vector2 position, bool horizontalFlip, bool verticalFlip, Color tint);
 void DrawAsepriteTagEx(AsepriteTag tag, Vector2 position, float rotation, float scale, Color tint);
+void DrawAsepriteTagExFlipped(AsepriteTag tag, Vector2 position, float rotation, float scale, bool horizontalFlip, bool verticalFlip, Color tint);
 void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, Color tint);
+void DrawAsepriteTagProFlipped(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, bool horizontalFlip, bool verticalFlip, Color tint);
 void SetAsepriteTagFrame(AsepriteTag* tag, int frameNumber);                           // Sets which frame the tag is currently displaying.
 int GetAsepriteTagFrame(AsepriteTag tag);
 
@@ -362,28 +369,40 @@ void UnloadAseprite(Aseprite aseprite) {
 }
 
 void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint) {
+    DrawAsepriteFlipped(aseprite, frame, posX, posY, false, false, tint);
+}
+
+void DrawAsepriteFlipped(Aseprite aseprite, int frame, int posX, int posY, bool horizontalFlip, bool verticalFlip, Color tint) {
     Vector2 position = {(float)posX, (float)posY};
-    DrawAsepriteV(aseprite, frame, position, tint);
+    DrawAsepriteVFlipped(aseprite, frame, position, horizontalFlip, verticalFlip, tint);
 }
 
 void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint) {
+    DrawAsepriteVFlipped(aseprite, frame, position, false, false, tint);
+}
+
+void DrawAsepriteVFlipped(Aseprite aseprite, int frame, Vector2 position, bool horizontalFlip, bool verticalFlip, Color tint) {
     ase_t* ase = aseprite.ase;
     if (ase == 0 || frame < 0 || frame >= ase->frame_count) {
         return;
     }
 
-    Rectangle source = {(float)(frame * ase->w), 0, (float)ase->w, (float)ase->h};
+    Rectangle source = {(float)(frame * ase->w), 0, horizontalFlip ? (float)-ase->w : ase->w, verticalFlip ? (float)-ase->h : (float)ase->h};
     Texture2D texture = GetAsepriteTexture(aseprite);
     DrawTextureRec(texture, source, position, tint);
 }
 
 void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint) {
+    DrawAsepriteExFlipped(aseprite, frame, position, rotation, scale, false, false, tint);
+}
+
+void DrawAsepriteExFlipped(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, bool horizontalFlip, bool verticalFlip, Color tint) {
     ase_t* ase = aseprite.ase;
     if (ase == 0 || frame < 0 || frame >= ase->frame_count) {
         return;
     }
 
-    Rectangle source = {(float)(frame * ase->w), 0, (float)ase->w, (float)ase->h};
+    Rectangle source = {(float)(frame * ase->w), 0, horizontalFlip ? (float)-ase->w : ase->w, verticalFlip ? (float)-ase->h : (float)ase->h};
     Texture2D texture = GetAsepriteTexture(aseprite);
     Rectangle dest = {(float)position.x, (float)position.y, (float)ase->w * scale, (float)ase->h * scale};
     Vector2 origin = {0, 0};
@@ -391,12 +410,16 @@ void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotati
 }
 
 void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint) {
+    DrawAsepriteProFlipped(aseprite, frame, dest, origin, rotation, false, false, tint);
+}
+
+void DrawAsepriteProFlipped(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, bool horizontalFlip, bool verticalFlip, Color tint) {
     ase_t* ase = aseprite.ase;
     if (ase == 0 || frame < 0 || frame >= ase->frame_count) {
         return;
     }
 
-    Rectangle source = {(float)(frame * ase->w), 0, (float)ase->w, (float)ase->h};
+    Rectangle source = {(float)(frame * ase->w), 0, horizontalFlip ? (float)-ase->w : ase->w, verticalFlip ? (float)-ase->h : (float)ase->h};
     Texture2D texture = GetAsepriteTexture(aseprite);
     DrawTexturePro(texture, source, dest, origin, rotation, tint);
 }
@@ -544,16 +567,32 @@ void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint) {
     DrawAseprite(tag.aseprite, tag.currentFrame, posX, posY, tint);
 }
 
+void DrawAsepriteTagFlipped(AsepriteTag tag, int posX, int posY, bool horizontalFlip, bool verticalFlip, Color tint) {
+    DrawAsepriteFlipped(tag.aseprite, tag.currentFrame, posX, posY, horizontalFlip, verticalFlip, tint);
+}
+
 void DrawAsepriteTagV(AsepriteTag tag, Vector2 position, Color tint) {
     DrawAsepriteV(tag.aseprite, tag.currentFrame, position, tint);
+}
+
+void DrawAsepriteTagVFlipped(AsepriteTag tag, Vector2 position, bool horizontalFlip, bool verticalFlip, Color tint) {
+    DrawAsepriteVFlipped(tag.aseprite, tag.currentFrame, position, horizontalFlip, verticalFlip, tint);
 }
 
 void DrawAsepriteTagEx(AsepriteTag tag, Vector2 position, float rotation, float scale, Color tint) {
     DrawAsepriteEx(tag.aseprite, tag.currentFrame, position, rotation, scale, tint);
 }
 
+void DrawAsepriteTagExFlipped(AsepriteTag tag, Vector2 position, float rotation, float scale, bool horizontalFlip, bool verticalFlip, Color tint) {
+    DrawAsepriteExFlipped(tag.aseprite, tag.currentFrame, position, rotation, scale, horizontalFlip, verticalFlip, tint);
+}
+
 void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, Color tint) {
     DrawAsepritePro(tag.aseprite, tag.currentFrame, dest, origin, rotation, tint);
+}
+
+void DrawAsepriteTagProFlipped(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, bool horizontalFlip, bool verticalFlip, Color tint) {
+    DrawAsepriteProFlipped(tag.aseprite, tag.currentFrame, dest, origin, rotation, horizontalFlip, verticalFlip, tint);
 }
 
 /**

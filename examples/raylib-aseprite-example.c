@@ -56,7 +56,7 @@ int main() {
             DrawAseprite(george, 0, 100, 100, WHITE);
             DrawAseprite(george, 4, 100, 150, WHITE);
             DrawAseprite(george, 8, 100, 200, WHITE);
-            DrawAseprite(george, 12, 100, 250, WHITE);
+            DrawAsepriteFlipped(george, 12, 100, 250, false, true, WHITE);
 
             // Draw the walking animation.
             DrawAsepriteTagEx(walking, position, 0, scale, WHITE);
