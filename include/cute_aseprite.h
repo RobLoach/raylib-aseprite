@@ -12,7 +12,7 @@
 
 	SUMMARY
 
-		cute_asesprite.h is a single-file header that implements some functions to
+		cute_aseprite.h is a single-file header that implements some functions to
 		parse .ase/.aseprite files. The entire file is parsed all at once and some
 		structs are filled out then handed back to you.
 
@@ -65,7 +65,7 @@
 
 			for (int i = 0; i < ase->frame_count; ++i) {
 				ase_frame_t* frame = ase->frames + i;
-				anim.add_frame(frame->duration, frame->pixels);
+				anim.add_frame(frame->duration_milliseconds, frame->pixels);
 			}
 
 
@@ -123,7 +123,6 @@ typedef struct ase_udata_t ase_udata_t;
 typedef struct ase_cel_extra_chunk_t ase_cel_extra_chunk_t;
 typedef struct ase_color_profile_t ase_color_profile_t;
 typedef struct ase_fixed_t ase_fixed_t;
-typedef struct ase_cel_extra_chunk_t ase_cel_extra_chunk_t;
 
 struct ase_color_t
 {
@@ -838,10 +837,9 @@ static char* s_fopen(const char* path, int* size, void* mem_ctx)
 	CUTE_ASEPRITE_FILE* fp = CUTE_ASEPRITE_FOPEN(path, "rb");
 	int sz = 0;
 
-	if (fp)
-	{
+	if (fp) {
 		CUTE_ASEPRITE_FSEEK(fp, 0, CUTE_ASEPRITE_SEEK_END);
-		sz = CUTE_ASEPRITE_FTELL(fp);
+		sz = (int)CUTE_ASEPRITE_FTELL(fp);
 		CUTE_ASEPRITE_FSEEK(fp, 0, CUTE_ASEPRITE_SEEK_SET);
 		data = (char*)CUTE_ASEPRITE_ALLOC(sz + 1, mem_ctx);
 		CUTE_ASEPRITE_FREAD(data, sz, 1, fp);
@@ -930,7 +928,7 @@ ase_t* cute_aseprite_load_from_memory(const void* memory, int size, void* mem_ct
 	ase_t* ase = (ase_t*)CUTE_ASEPRITE_ALLOC(sizeof(ase_t), mem_ctx);
 	CUTE_ASEPRITE_MEMSET(ase, 0, sizeof(*ase));
 
-	ase_state_t state = { 0 };
+	ase_state_t state = { 0, 0, 0 };
 	ase_state_t* s = &state;
 	s->in = (uint8_t*)memory;
 	s->end = s->in + size;
@@ -996,22 +994,22 @@ ase_t* cute_aseprite_load_from_memory(const void* memory, int size, void* mem_ct
 			switch (chunk_type) {
 			case 0x0004: // Old Palette chunk (used when there are no colors with alpha in the palette)
 			{
-				int nbPackets = (int)s_read_uint16(s);
-				for (int k = 0; k < nbPackets ; k++ ) {
-					uint16_t maxColor=0;
-					uint8_t skip = s_read_uint8(s);
-					uint16_t nbColors = s_read_uint8(s);
+				uint16_t nbPackets = s_read_uint16(s);
+				for (uint16_t k = 0; k < nbPackets; k++) {
+					uint16_t maxColor = 0;
+					uint16_t skip = (uint16_t)s_read_uint8(s);
+					uint16_t nbColors = (uint16_t)s_read_uint8(s);
 					if (nbColors == 0) nbColors = 256;
 
-					for (int l = 0; l < nbColors; l++) {
+					for (uint16_t l = 0; l < nbColors; l++) {
 						ase_palette_entry_t entry;
 						entry.color.r = s_read_uint8(s);
 						entry.color.g = s_read_uint8(s);
 						entry.color.b = s_read_uint8(s);
 						entry.color.a = 255;
 						entry.color_name = NULL;
-						ase->palette.entries[skip+l] = entry;
-						if (skip+l > maxColor) maxColor = skip+l;
+						ase->palette.entries[skip + l] = entry;
+						if (skip + l > maxColor) maxColor = skip + l;
 					}
 
 					ase->palette.entry_count = maxColor+1;
@@ -1122,18 +1120,16 @@ ase_t* cute_aseprite_load_from_memory(const void* memory, int size, void* mem_ct
 				s_skip(s, 8); // For future (set to zero).
 				CUTE_ASEPRITE_ASSERT(ase->tag_count < CUTE_ASEPRITE_MAX_TAGS);
 				for (int k = 0; k < ase->tag_count; ++k) {
-					ase_tag_t tag;
-					tag.from_frame = (int)s_read_uint16(s);
-					tag.to_frame = (int)s_read_uint16(s);
-					tag.loop_animation_direction = (ase_animation_direction_t)s_read_uint8(s);
-					tag.repeat = s_read_uint16(s);
+					ase->tags[k].from_frame = (int)s_read_uint16(s);
+					ase->tags[k].to_frame = (int)s_read_uint16(s);
+					ase->tags[k].loop_animation_direction = (ase_animation_direction_t)s_read_uint8(s);
+					ase->tags[k].repeat = s_read_uint16(s);
 					s_skip(s, 6); // For future (set to zero).
-					tag.r = s_read_uint8(s);
-					tag.g = s_read_uint8(s);
-					tag.b = s_read_uint8(s);
+					ase->tags[k].r = s_read_uint8(s);
+					ase->tags[k].g = s_read_uint8(s);
+					ase->tags[k].b = s_read_uint8(s);
 					s_skip(s, 1); // Extra byte (zero).
-					tag.name = s_read_string(s);
-					ase->tags[k] = tag;
+					ase->tags[k].name = s_read_string(s);
 				}
 				was_on_tags = 1;
 			}	break;
@@ -1190,7 +1186,8 @@ ase_t* cute_aseprite_load_from_memory(const void* memory, int size, void* mem_ct
 				s_skip(s, sizeof(uint32_t)); // Reserved.
 				const char* name = s_read_string(s);
 				for (int k = 0; k < (int)slice_count; ++k) {
-					ase_slice_t slice = { 0 };
+					ase_slice_t slice;
+					CUTE_ASEPRITE_MEMSET(&slice, 0, sizeof(slice));
 					slice.name = name;
 					slice.frame_number = (int)s_read_uint32(s);
 					slice.origin_x = (int)s_read_int32(s);
