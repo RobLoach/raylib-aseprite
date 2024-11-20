@@ -26,8 +26,8 @@ int main(int argc, char *argv[]) {
     assert(aseprite.ase->frame_count > 20);
     assert(aseprite.ase->frame_count < 40);
 
-    // IsAsepriteReady()
-    assert(IsAsepriteReady(aseprite));
+    // IsAsepriteValid()
+    assert(IsAsepriteValid(aseprite));
 
     // GetAsepriteWidth()
     assert(GetAsepriteWidth(aseprite) == 64);
@@ -54,8 +54,8 @@ int main(int argc, char *argv[]) {
     assert(tag.color.a == expected.a);
     assert(TextIsEqual(tag.name, "Backwards"));
 
-    // IsAsepriteTagReady()
-    assert(IsAsepriteTagReady(tag));
+    // IsAsepriteTagValid()
+    assert(IsAsepriteTagValid(tag));
 
     // LoadAsepriteTagFromIndex()
     {
@@ -128,17 +128,17 @@ int main(int argc, char *argv[]) {
         assert(TextIsEqual(slice.name, "Number"));
     }
 
-    // IsAsepriteSliceReady()
+    // IsAsepriteSliceValid()
     {
         AsepriteSlice slice = LoadAsperiteSliceFromIndex(aseprite, 0);
-        assert(IsAsepriteSliceReady(slice));
+        assert(IsAsepriteSliceValid(slice));
 
         AsepriteSlice noSlice;
         noSlice.name = "";
-        assert(!IsAsepriteSliceReady(noSlice));
+        assert(!IsAsepriteSliceValid(noSlice));
 
         noSlice = LoadAsperiteSliceFromIndex(aseprite, 100);
-        assert(!IsAsepriteSliceReady(noSlice));
+        assert(!IsAsepriteSliceValid(noSlice));
     }
 
     // GenAsepriteSliceDefault()

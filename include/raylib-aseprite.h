@@ -82,7 +82,7 @@ typedef struct AsepriteSlice {
 // Aseprite functions
 Aseprite LoadAseprite(const char* fileName);                        // Load an .aseprite file
 Aseprite LoadAsepriteFromMemory(unsigned char* fileData, int size);  // Load an aseprite file from memory
-bool IsAsepriteReady(Aseprite aseprite);                            // Check if the given Aseprite was loaded successfully
+bool IsAsepriteValid(Aseprite aseprite);                            // Check if the given Aseprite was loaded successfully
 void UnloadAseprite(Aseprite aseprite);                             // Unloads the aseprite file
 void TraceAseprite(Aseprite aseprite);                              // Display all information associated with the aseprite
 Texture GetAsepriteTexture(Aseprite aseprite);                      // Retrieve the raylib texture associated with the aseprite
@@ -100,7 +100,7 @@ void DrawAsepriteProFlipped(Aseprite aseprite, int frame, Rectangle dest, Vector
 AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name);   // Load an Aseprite tag animation sequence
 AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index); // Load an Aseprite tag animation sequence from its index
 int GetAsepriteTagCount(Aseprite aseprite);                         // Get the total amount of available tags
-bool IsAsepriteTagReady(AsepriteTag tag);                           // Check if the given Aseprite tag was loaded successfully
+bool IsAsepriteTagValid(AsepriteTag tag);                           // Check if the given Aseprite tag was loaded successfully
 void UpdateAsepriteTag(AsepriteTag* tag);                           // Update the tag animation frame
 AsepriteTag GenAsepriteTagDefault();                                // Generate an empty Tag with sane defaults
 void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint);
@@ -118,7 +118,7 @@ int GetAsepriteTagFrame(AsepriteTag tag);
 AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name);   // Load a slice from an Aseprite based on its name.
 AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index); // Load a slice from an Aseprite based on its index.
 int GetAsepriteSliceCount(Aseprite aseprite);                       // Get the amount of slices that are defined in the Aseprite.
-bool IsAsepriteSliceReady(AsepriteSlice slice);                     // Return whether or not the given slice was found.
+bool IsAsepriteSliceValid(AsepriteSlice slice);                     // Return whether or not the given slice was found.
 AsepriteSlice GenAsepriteSliceDefault();                            // Generate empty Aseprite slice data.
 
 #ifdef __cplusplus
@@ -241,7 +241,7 @@ Aseprite LoadAsepriteFromMemory(unsigned char* fileData, int size) {
  * @return The loaded Aseprite object, or an empty one on failure.
  *
  * @see UnloadAseprite()
- * @see IsAsepriteReady()
+ * @see IsAsepriteValid()
  */
 Aseprite LoadAseprite(const char* fileName) {
     int bytesRead;
@@ -265,7 +265,7 @@ Aseprite LoadAseprite(const char* fileName) {
  *
  * @return True if the Aseprite was loaded successfully, false otherwise.
  */
-bool IsAsepriteReady(Aseprite aseprite) {
+bool IsAsepriteValid(Aseprite aseprite) {
     return aseprite.ase != 0;
 }
 
@@ -387,7 +387,10 @@ void DrawAsepriteVFlipped(Aseprite aseprite, int frame, Vector2 position, bool h
         return;
     }
 
-    Rectangle source = {(float)(frame * ase->w), 0, horizontalFlip ? (float)-ase->w : ase->w, verticalFlip ? (float)-ase->h : (float)ase->h};
+    Rectangle source = {(float)(frame * ase->w), 0,
+        horizontalFlip ? (float)-ase->w : (float)ase->w,
+        verticalFlip ? (float)-ase->h : (float)ase->h
+    };
     Texture2D texture = GetAsepriteTexture(aseprite);
     DrawTextureRec(texture, source, position, tint);
 }
@@ -402,7 +405,10 @@ void DrawAsepriteExFlipped(Aseprite aseprite, int frame, Vector2 position, float
         return;
     }
 
-    Rectangle source = {(float)(frame * ase->w), 0, horizontalFlip ? (float)-ase->w : ase->w, verticalFlip ? (float)-ase->h : (float)ase->h};
+    Rectangle source = {(float)(frame * ase->w), 0,
+        horizontalFlip ? (float)-ase->w : (float)ase->w,
+        verticalFlip ? (float)-ase->h : (float)ase->h
+    };
     Texture2D texture = GetAsepriteTexture(aseprite);
     Rectangle dest = {(float)position.x, (float)position.y, (float)ase->w * scale, (float)ase->h * scale};
     Vector2 origin = {0, 0};
@@ -419,7 +425,11 @@ void DrawAsepriteProFlipped(Aseprite aseprite, int frame, Rectangle dest, Vector
         return;
     }
 
-    Rectangle source = {(float)(frame * ase->w), 0, horizontalFlip ? (float)-ase->w : ase->w, verticalFlip ? (float)-ase->h : (float)ase->h};
+    Rectangle source = {
+        (float)(frame * ase->w), 0,
+        horizontalFlip ? (float)-ase->w : (float)ase->w,
+        verticalFlip ? (float)-ase->h : (float)ase->h
+    };
     Texture2D texture = GetAsepriteTexture(aseprite);
     DrawTexturePro(texture, source, dest, origin, rotation, tint);
 }
@@ -624,7 +634,7 @@ AsepriteTag GenAsepriteTagDefault() {
  * @return The Aseprite tag information, or an empty tag on failure.
  *
  * @see LoadAsepriteTag()
- * @see IsAsepriteTagReady()
+ * @see IsAsepriteTagValid()
  */
 AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index) {
     AsepriteTag tag = GenAsepriteTagDefault();
@@ -684,7 +694,7 @@ AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index) {
  *
  * @return The loaded Aseprite tag, or an empty tag on failure.
  *
- * @see IsAsepriteTagReady()
+ * @see IsAsepriteTagValid()
  * @see UpdateAsepriteTag()
  */
 AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name) {
@@ -715,7 +725,7 @@ AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name) {
  *
  * @return True if the tag was loaded, false otherwise.
  */
-bool IsAsepriteTagReady(AsepriteTag tag) {
+bool IsAsepriteTagValid(AsepriteTag tag) {
     return tag.tag != 0;
 }
 
@@ -789,7 +799,7 @@ int GetAsepriteSliceCount(Aseprite aseprite) {
 /**
  * Return whether or not the given slice was found.
  */
-bool IsAsepriteSliceReady(AsepriteSlice slice) {
+bool IsAsepriteSliceValid(AsepriteSlice slice) {
     return TextLength(slice.name) != 0;
 }
 

@@ -73,7 +73,7 @@ See the [examples directory](examples) for more demonstrations of how to use *ra
 // Aseprite functions
 Aseprite LoadAseprite(const char* fileName);                        // Load an .aseprite file
 Aseprite LoadAsepriteFromMemory(unsigned char* fileData, int size);  // Load an aseprite file from memory
-bool IsAsepriteReady(Aseprite aseprite);                            // Check if the given Aseprite was loaded successfully
+bool IsAsepriteValid(Aseprite aseprite);                            // Check if the given Aseprite was loaded successfully
 void UnloadAseprite(Aseprite aseprite);                             // Unloads the aseprite file
 void TraceAseprite(Aseprite aseprite);                              // Display all information associated with the aseprite
 Texture GetAsepriteTexture(Aseprite aseprite);                      // Retrieve the raylib texture associated with the aseprite
@@ -88,7 +88,7 @@ void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origi
 AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name);   // Load an Aseprite tag animation sequence
 AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index); // Load an Aseprite tag animation sequence from its index
 int GetAsepriteTagCount(Aseprite aseprite);                         // Get the total amount of available tags
-bool IsAsepriteTagReady(AsepriteTag tag);                           // Check if the given Aseprite tag was loaded successfully
+bool IsAsepriteTagValid(AsepriteTag tag);                           // Check if the given Aseprite tag was loaded successfully
 void UpdateAsepriteTag(AsepriteTag* tag);                           // Update the tag animation frame
 AsepriteTag GenAsepriteTagDefault();                                // Generate an empty Tag with sane defaults
 void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint);
@@ -100,7 +100,7 @@ void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float r
 AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name);   // Load a slice from an Aseprite based on its name.
 AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index); // Load a slice from an Aseprite based on its index.
 int GetAsepriteSliceCount(Aseprite aseprite);                       // Get the amount of slices that are defined in the Aseprite.
-bool IsAsepriteSliceReady(AsepriteSlice slice);                     // Return whether or not the given slice was found.
+bool IsAsepriteSliceValid(AsepriteSlice slice);                     // Return whether or not the given slice was found.
 AsepriteSlice GenAsepriteSliceDefault();                            // Generate empty Aseprite slice data.
 ```
 
