@@ -104,6 +104,10 @@ bool IsAsepriteSliceValid(AsepriteSlice slice);                     // Return wh
 AsepriteSlice GenAsepriteSliceDefault();                            // Generate empty Aseprite slice data.
 ```
 
+## Similar Solutions
+
+- [Nayanim](https://github.com/VaguinerG/nayanim) - Animation Extension for Nim's Raylib, by [VaguinerG](https://github.com/VaguinerG)
+
 ## Development
 
 To build the example locally, and run tests, use [cmake](https://cmake.org/).
