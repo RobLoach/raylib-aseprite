@@ -42,7 +42,7 @@ int main() {
 
     while(!WindowShouldClose()) {
         // Update the animation frame.
-        UpdateAsperiteTag(&walkdown);
+        UpdateAsepriteTag(&walkdown);
 
         BeginDrawing();
         {
