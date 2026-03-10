@@ -122,22 +122,22 @@ int main(int argc, char *argv[]) {
         assert(slice.bounds.height > 2);
     }
 
-    // LoadAsperiteSliceFromIndex()
+    // LoadAsepriteSliceFromIndex()
     {
-        AsepriteSlice slice = LoadAsperiteSliceFromIndex(aseprite, 1);
+        AsepriteSlice slice = LoadAsepriteSliceFromIndex(aseprite, 1);
         assert(TextIsEqual(slice.name, "Number"));
     }
 
     // IsAsepriteSliceValid()
     {
-        AsepriteSlice slice = LoadAsperiteSliceFromIndex(aseprite, 0);
+        AsepriteSlice slice = LoadAsepriteSliceFromIndex(aseprite, 0);
         assert(IsAsepriteSliceValid(slice));
 
         AsepriteSlice noSlice;
         noSlice.name = "";
         assert(!IsAsepriteSliceValid(noSlice));
 
-        noSlice = LoadAsperiteSliceFromIndex(aseprite, 100);
+        noSlice = LoadAsepriteSliceFromIndex(aseprite, 100);
         assert(!IsAsepriteSliceValid(noSlice));
     }
 

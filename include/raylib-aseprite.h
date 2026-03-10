@@ -2,10 +2,10 @@
 *
 *   raylib-aseprite - Aseprite sprite loader for raylib.
 *
-*   Copyright 2021 Rob Loach (@RobLoach)
+*   Copyright 2026 Rob Loach (@RobLoach)
 *
 *   DEPENDENCIES:
-*       raylib 5.0+ https://www.raylib.com/
+*       raylib 5.5+ https://www.raylib.com/
 *
 *   LICENSE: zlib/libpng
 *
@@ -92,6 +92,7 @@ void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint);
 void DrawAsepriteFlipped(Aseprite aseprite, int frame, int posX, int posY, bool horizontalFlip, bool verticalFlip, Color tint);
 void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint);
 void DrawAsepriteVFlipped(Aseprite aseprite, int frame, Vector2 position, bool horizontalFlip, bool verticalFlip, Color tint);
+void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint);
 void DrawAsepriteExFlipped(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, bool horizontalFlip, bool verticalFlip, Color tint);
 void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint);
 void DrawAsepriteProFlipped(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, bool horizontalFlip, bool verticalFlip, Color tint);
@@ -116,7 +117,7 @@ int GetAsepriteTagFrame(AsepriteTag tag);
 
 // Aseprite Slice functions
 AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name);   // Load a slice from an Aseprite based on its name.
-AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index); // Load a slice from an Aseprite based on its index.
+AsepriteSlice LoadAsepriteSliceFromIndex(Aseprite aseprite, int index); // Load a slice from an Aseprite based on its index.
 int GetAsepriteSliceCount(Aseprite aseprite);                       // Get the amount of slices that are defined in the Aseprite.
 bool IsAsepriteSliceValid(AsepriteSlice slice);                     // Return whether or not the given slice was found.
 AsepriteSlice GenAsepriteSliceDefault();                            // Generate empty Aseprite slice data.
@@ -279,7 +280,7 @@ bool IsAsepriteValid(Aseprite aseprite) {
 inline Texture GetAsepriteTexture(Aseprite aseprite) {
     if (aseprite.ase == 0) {
         struct Texture texture;
-        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get Texture from non-existant aseprite");
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get Texture from non-existent aseprite");
         texture.id = 0;
         texture.width = 0;
         texture.height = 0;
@@ -301,7 +302,7 @@ inline Texture GetAsepriteTexture(Aseprite aseprite) {
  */
 int GetAsepriteWidth(Aseprite aseprite) {
     if (aseprite.ase == 0) {
-        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get width from non-existant aseprite");
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get width from non-existent aseprite");
         return 0;
     }
 
@@ -317,7 +318,7 @@ int GetAsepriteWidth(Aseprite aseprite) {
  */
 int GetAsepriteHeight(Aseprite aseprite) {
     if (aseprite.ase == 0) {
-        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get width from non-existant aseprite");
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get width from non-existent aseprite");
         return 0;
     }
 
@@ -333,7 +334,7 @@ int GetAsepriteHeight(Aseprite aseprite) {
  */
 int GetAsepriteTagCount(Aseprite aseprite) {
     if (aseprite.ase == 0) {
-        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get tag count non-existant aseprite");
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get tag count non-existent aseprite");
         return 0;
     }
 
@@ -362,7 +363,7 @@ void UnloadAseprite(Aseprite aseprite) {
         MemFree(ase->mem_ctx);
     }
 
-    // Destory the aseprite data.
+    // Destroy the aseprite data.
     cute_aseprite_free(ase);
 
     TraceLog(LOG_INFO, "ASEPRITE: Unloaded Aseprite data successfully");
@@ -642,7 +643,7 @@ AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index) {
     // Ensure the Aseprite exists.
     ase_t* ase = aseprite.ase;
     if (ase == 0) {
-        TraceLog(LOG_ERROR, "ASEPRITE: Asprite not loaded when attempting to load tag #%i", index);
+        TraceLog(LOG_ERROR, "ASEPRITE: Aseprite not loaded when attempting to load tag #%i", index);
         return tag;
     }
 
@@ -681,7 +682,7 @@ AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index) {
     tag.name = (char*)tag.tag->name;
 
     // Display a trace log about the aseprite tag
-    TraceLog(LOG_TRACE, "ASEPRITE: [ID %i] Asprite tag loaded successfully (%s)", index, tag.name);
+    TraceLog(LOG_TRACE, "ASEPRITE: [ID %i] Aseprite tag loaded successfully (%s)", index, tag.name);
 
     return tag;
 }
@@ -744,7 +745,7 @@ AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name) {
     for (int i = 0; i < aseprite.ase->slice_count; i++) {
         ase_slice_t* slice = &aseprite.ase->slices[i];
         if (TextIsEqual(name, slice->name)) {
-            return LoadAsperiteSliceFromIndex(aseprite, i);
+            return LoadAsepriteSliceFromIndex(aseprite, i);
         }
     }
 
@@ -758,7 +759,7 @@ AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name) {
  *
  * @return The loaded slice, or an empty one if not found.
  */
-AsepriteSlice LoadAsperiteSliceFromIndex(Aseprite aseprite, int index) {
+AsepriteSlice LoadAsepriteSliceFromIndex(Aseprite aseprite, int index) {
     if (aseprite.ase == NULL) {
         TraceLog(LOG_WARNING, "ASEPRITE: Cannot load slice index from empty aseprite");
         return GenAsepriteSliceDefault();
@@ -793,6 +794,11 @@ AsepriteSlice GenAsepriteSliceDefault() {
  * @return The amount of slices.
  */
 int GetAsepriteSliceCount(Aseprite aseprite) {
+    if (aseprite.ase == 0) {
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get slice count from non-existent aseprite");
+        return 0;
+    }
+
     return aseprite.ase->slice_count;
 }
 
