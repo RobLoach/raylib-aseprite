@@ -7,7 +7,7 @@
 *
 *   Example by Rob Loach (@RobLoach)
 *
-*   Copyright (c) 2021 Rob Loach (@RobLoach)
+*   Copyright (c) 2026 Rob Loach (@RobLoach)
 *
 ********************************************************************************************/
 
