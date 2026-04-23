@@ -201,17 +201,20 @@ Aseprite LoadAsepriteFromMemory(unsigned char* fileData, int size) {
         ImageDraw(&image, frameImage, src, dest, WHITE);
     }
 
-    // Apply the transparent pixel.
-    int transparency  = ase->transparent_palette_entry_index;
-    if (transparency >= 0 && transparency < ase->palette.entry_count) {
-        ase_color_t transparentColor = ase->palette.entries[transparency].color;
-        Color source = {
-            .r = transparentColor.r,
-            .g = transparentColor.g,
-            .b = transparentColor.b,
-            .a = transparentColor.a
-        };
-        ImageColorReplace(&image, source, BLANK);
+    // Apply the transparent pixel for indexed mode only.
+    // For RGBA and grayscale modes, transparency is already in the alpha channel.
+    if (ase->mode == ASE_MODE_INDEXED) {
+        int transparency = ase->transparent_palette_entry_index;
+        if (transparency >= 0 && transparency < ase->palette.entry_count) {
+            ase_color_t transparentColor = ase->palette.entries[transparency].color;
+            Color source = {
+                .r = transparentColor.r,
+                .g = transparentColor.g,
+                .b = transparentColor.b,
+                .a = transparentColor.a
+            };
+            ImageColorReplace(&image, source, BLANK);
+        }
     }
 
     // Create the Texture
