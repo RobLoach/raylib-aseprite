@@ -159,6 +159,10 @@ extern "C" {
 
 #include "cute_aseprite.h" // NOLINT
 
+// Compile-time guard: frame->pixels is cast directly to PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,
+// which requires ase_color_t to be exactly {uint8_t r,g,b,a} with no padding.
+typedef char ase_color_t_must_be_4_bytes[(sizeof(ase_color_t) == 4) ? 1 : -1];
+
 /**
  * Load an .aseprite file through its memory data.
  *
@@ -199,22 +203,6 @@ Aseprite LoadAsepriteFromMemory(unsigned char* fileData, int size) {
             .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
         };
         ImageDraw(&image, frameImage, src, dest, WHITE);
-    }
-
-    // Apply the transparent pixel for indexed mode only.
-    // For RGBA and grayscale modes, transparency is already in the alpha channel.
-    if (ase->mode == ASE_MODE_INDEXED) {
-        int transparency = ase->transparent_palette_entry_index;
-        if (transparency >= 0 && transparency < ase->palette.entry_count) {
-            ase_color_t transparentColor = ase->palette.entries[transparency].color;
-            Color source = {
-                .r = transparentColor.r,
-                .g = transparentColor.g,
-                .b = transparentColor.b,
-                .a = transparentColor.a
-            };
-            ImageColorReplace(&image, source, BLANK);
-        }
     }
 
     // Create the Texture
