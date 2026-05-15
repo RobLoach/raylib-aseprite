@@ -268,7 +268,7 @@ bool IsAsepriteValid(Aseprite aseprite) {
  *
  * @return The internal texture associated with the Aseprite, or an empty Texture on failure.
  */
-inline Texture GetAsepriteTexture(Aseprite aseprite) {
+Texture GetAsepriteTexture(Aseprite aseprite) {
     if (aseprite.ase == 0) {
         struct Texture texture;
         TraceLog(LOG_WARNING, "ASEPRITE: Cannot get Texture from non-existent aseprite");
