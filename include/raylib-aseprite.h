@@ -32,8 +32,8 @@
 #ifndef INCLUDE_RAYLIB_ASEPRITE_H_
 #define INCLUDE_RAYLIB_ASEPRITE_H_
 
-#include "raylib.h" // NOLINT
-#include "cute_aseprite.h" // NOLINT
+#include <raylib.h> // NOLINT
+#include <cute_aseprite.h> // NOLINT
 
 #ifdef __cplusplus
 extern "C" {
