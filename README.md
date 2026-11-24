@@ -10,9 +10,9 @@ Load [Aseprite](https://www.aseprite.org) `.aseprite` and `.ase` files for anima
 - Load [Aseprite](https://www.aseprite.org/) files directly for use in raylib
 - Draw individual frames
 - Load and draw [Aseprite tags](https://www.aseprite.org/docs/tags/) as sprite animations
-- Support for Forwards, Backwards, and Ping-Pong animations
+- Support for Forwards, Backwards, Ping-Pong, and Ping-Pong Reverse animations
 - Adjust tag animation speed by using `tag.speed`
-- Pause tag animations by using `tag.pause`
+- Pause tag animations by using `tag.paused`
 - Toggle whether animations will continue when they finish with `tag.loop`
 - Load [Aseprite slice](https://www.aseprite.org/docs/slices/) rectangles for collisions and bounds
 
@@ -80,9 +80,13 @@ Texture GetAsepriteTexture(Aseprite aseprite);                      // Retrieve 
 int GetAsepriteWidth(Aseprite aseprite);                            // Get the width of the sprite
 int GetAsepriteHeight(Aseprite aseprite);                           // Get the height of the sprite
 void DrawAseprite(Aseprite aseprite, int frame, int posX, int posY, Color tint);
+void DrawAsepriteFlipped(Aseprite aseprite, int frame, int posX, int posY, bool horizontalFlip, bool verticalFlip, Color tint);
 void DrawAsepriteV(Aseprite aseprite, int frame, Vector2 position, Color tint);
+void DrawAsepriteVFlipped(Aseprite aseprite, int frame, Vector2 position, bool horizontalFlip, bool verticalFlip, Color tint);
 void DrawAsepriteEx(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, Color tint);
+void DrawAsepriteExFlipped(Aseprite aseprite, int frame, Vector2 position, float rotation, float scale, bool horizontalFlip, bool verticalFlip, Color tint);
 void DrawAsepritePro(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, Color tint);
+void DrawAsepriteProFlipped(Aseprite aseprite, int frame, Rectangle dest, Vector2 origin, float rotation, bool horizontalFlip, bool verticalFlip, Color tint);
 
 // Aseprite Tag functions
 AsepriteTag LoadAsepriteTag(Aseprite aseprite, const char* name);   // Load an Aseprite tag animation sequence
@@ -92,9 +96,15 @@ bool IsAsepriteTagValid(AsepriteTag tag);                           // Check if 
 void UpdateAsepriteTag(AsepriteTag* tag);                           // Update the tag animation frame
 AsepriteTag GenAsepriteTagDefault();                                // Generate an empty Tag with sane defaults
 void DrawAsepriteTag(AsepriteTag tag, int posX, int posY, Color tint);
+void DrawAsepriteTagFlipped(AsepriteTag tag, int posX, int posY, bool horizontalFlip, bool verticalFlip, Color tint);
 void DrawAsepriteTagV(AsepriteTag tag, Vector2 position, Color tint);
+void DrawAsepriteTagVFlipped(AsepriteTag tag, Vector2 position, bool horizontalFlip, bool verticalFlip, Color tint);
 void DrawAsepriteTagEx(AsepriteTag tag, Vector2 position, float rotation, float scale, Color tint);
+void DrawAsepriteTagExFlipped(AsepriteTag tag, Vector2 position, float rotation, float scale, bool horizontalFlip, bool verticalFlip, Color tint);
 void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, Color tint);
+void DrawAsepriteTagProFlipped(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, bool horizontalFlip, bool verticalFlip, Color tint);
+void SetAsepriteTagFrame(AsepriteTag* tag, int frameNumber);        // Set which frame the tag is displaying (negative counts from the end)
+int GetAsepriteTagFrame(AsepriteTag tag);                           // Get which frame the tag is displaying, relative to the tag's start
 
 // Aseprite Slice functions
 AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name);   // Load a slice from an Aseprite based on its name.
@@ -113,7 +123,6 @@ AsepriteSlice GenAsepriteSliceDefault();                            // Generate 
 To build the example locally, and run tests, use [cmake](https://cmake.org/).
 
 ``` bash
-git submodule update --init
 mkdir build
 cd build
 cmake ..

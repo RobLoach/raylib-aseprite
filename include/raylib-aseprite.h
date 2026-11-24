@@ -112,8 +112,8 @@ void DrawAsepriteTagEx(AsepriteTag tag, Vector2 position, float rotation, float 
 void DrawAsepriteTagExFlipped(AsepriteTag tag, Vector2 position, float rotation, float scale, bool horizontalFlip, bool verticalFlip, Color tint);
 void DrawAsepriteTagPro(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, Color tint);
 void DrawAsepriteTagProFlipped(AsepriteTag tag, Rectangle dest, Vector2 origin, float rotation, bool horizontalFlip, bool verticalFlip, Color tint);
-void SetAsepriteTagFrame(AsepriteTag* tag, int frameNumber);                           // Sets which frame the tag is currently displaying.
-int GetAsepriteTagFrame(AsepriteTag tag);
+void SetAsepriteTagFrame(AsepriteTag* tag, int frameNumber);        // Set which frame the tag is displaying (negative counts from the end)
+int GetAsepriteTagFrame(AsepriteTag tag);                           // Get which frame the tag is displaying, relative to the tag's start
 
 // Aseprite Slice functions
 AsepriteSlice LoadAsepriteSlice(Aseprite aseprite, const char* name);   // Load a slice from an Aseprite based on its name.
@@ -141,7 +141,7 @@ extern "C" {
 #endif
 
 // Have cute_aseprite report warnings through raylib.
-#define CUTE_ASEPRITE_WARNING(msg) TraceLog(LOG_WARNING, "ASEPRITE: %s (cute_headers.h:%i)", msg, __LINE__)
+#define CUTE_ASEPRITE_WARNING(msg) TraceLog(LOG_WARNING, "ASEPRITE: %s (cute_aseprite.h:%i)", msg, __LINE__)
 
 #define CUTE_ASEPRITE_ASSERT(condition) do { if (!(condition)) { TraceLog(LOG_WARNING, "ASEPRITE: Failed assert \"%s\" in %s:%i", #condition, __FILE__, __LINE__); } } while(0)
 
@@ -315,7 +315,7 @@ int GetAsepriteWidth(Aseprite aseprite) {
  */
 int GetAsepriteHeight(Aseprite aseprite) {
     if (aseprite.ase == 0) {
-        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get width from non-existent aseprite");
+        TraceLog(LOG_WARNING, "ASEPRITE: Cannot get height from non-existent aseprite");
         return 0;
     }
 
