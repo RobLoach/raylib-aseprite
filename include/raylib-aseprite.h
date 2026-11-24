@@ -148,6 +148,9 @@ extern "C" {
 #define CUTE_ASEPRITE_ALLOC(size, ctx) MemAlloc((unsigned int)(size))
 #define CUTE_ASEPRITE_FREE(mem, ctx) MemFree((void*)(mem))
 
+// Aseprite 1.3's "Ping-pong Reverse" tag direction, which cute_aseprite does not define.
+#define RAYLIB_ASEPRITE_DIRECTION_PINGPONG_REVERSE 3
+
 #define CUTE_ASEPRITE_SEEK_SET 0
 #define CUTE_ASEPRITE_SEEK_END 0
 #define CUTE_ASEPRITE_FILE void
@@ -488,7 +491,7 @@ void UpdateAsepriteTag(AsepriteTag* tag) {
 
     // Advance the frame and see if it's time to reset the position.
     tag->currentFrame += tag->direction;
-    switch (aseTag->loop_animation_direction) {
+    switch ((int)aseTag->loop_animation_direction) {
         case ASE_ANIMATION_DIRECTION_FORWARDS:
             if (tag->currentFrame > aseTag->to_frame) {
                 if (tag->loop) {
@@ -510,6 +513,7 @@ void UpdateAsepriteTag(AsepriteTag* tag) {
             }
         break;
         case ASE_ANIMATION_DIRECTION_PINGPONG:
+        case RAYLIB_ASEPRITE_DIRECTION_PINGPONG_REVERSE:
             if (tag->direction > 0) {
                 if (tag->currentFrame > aseTag->to_frame) {
                     tag->direction = -1;
@@ -530,6 +534,12 @@ void UpdateAsepriteTag(AsepriteTag* tag) {
                         tag->paused = true;
                     }
                 }
+            }
+        break;
+        default:
+            // Unknown direction: keep the frame within the tag's range.
+            if (tag->currentFrame > aseTag->to_frame || tag->currentFrame < aseTag->from_frame) {
+                tag->currentFrame = aseTag->from_frame;
             }
         break;
     }
@@ -664,7 +674,8 @@ AsepriteTag LoadAsepriteTagFromIndex(Aseprite aseprite, int index) {
     // Set up the frame range
     tag.direction = 1;
     tag.currentFrame = tag.tag->from_frame;
-    if (tag.tag->loop_animation_direction == ASE_ANIMATION_DIRECTION_BACKWORDS) {
+    if (tag.tag->loop_animation_direction == ASE_ANIMATION_DIRECTION_BACKWORDS ||
+        (int)tag.tag->loop_animation_direction == RAYLIB_ASEPRITE_DIRECTION_PINGPONG_REVERSE) {
         tag.currentFrame = tag.tag->to_frame;
         tag.direction = -1;
     }

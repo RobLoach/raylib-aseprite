@@ -78,6 +78,22 @@ int main(int argc, char *argv[]) {
         assert(frame == 9 - 3);
     }
 
+    // UpdateAsepriteTag() with Ping-pong Reverse
+    {
+        AsepriteTag tag = LoadAsepriteTagFromIndex(aseprite, 2);
+        tag.tag->loop_animation_direction = (ase_animation_direction_t)RAYLIB_ASEPRITE_DIRECTION_PINGPONG_REVERSE;
+        tag = LoadAsepriteTagFromIndex(aseprite, 2);
+        assert(tag.currentFrame == tag.tag->to_frame);
+        assert(tag.direction == -1);
+        for (int i = 0; i < 50; i++) {
+            tag.timer = 0;
+            UpdateAsepriteTag(&tag);
+            assert(tag.currentFrame >= tag.tag->from_frame);
+            assert(tag.currentFrame <= tag.tag->to_frame);
+        }
+        tag.tag->loop_animation_direction = ASE_ANIMATION_DIRECTION_PINGPONG;
+    }
+
     // GetAsepriteTexture()
     Texture texture = GetAsepriteTexture(aseprite);
     assert(texture.width > 50);
