@@ -485,68 +485,71 @@ void UpdateAsepriteTag(AsepriteTag* tag) {
 
     // Count down the timer and see if it's time to update the frame.
     tag->timer -= GetFrameTime() * tag->speed;
-    if (tag->timer > 0) {
-        return;
-    }
-
-    // Advance the frame and see if it's time to reset the position.
-    tag->currentFrame += tag->direction;
-    switch ((int)aseTag->loop_animation_direction) {
-        case ASE_ANIMATION_DIRECTION_FORWARDS:
-            if (tag->currentFrame > aseTag->to_frame) {
-                if (tag->loop) {
-                    tag->currentFrame = aseTag->from_frame;
-                } else {
-                    tag->currentFrame = aseTag->to_frame;
-                    tag->paused = true;
-                }
-            }
-        break;
-        case ASE_ANIMATION_DIRECTION_BACKWORDS:
-            if (tag->currentFrame < aseTag->from_frame) {
-                if (tag->loop) {
-                    tag->currentFrame = aseTag->to_frame;
-                } else {
-                    tag->currentFrame = aseTag->from_frame;
-                    tag->paused = true;
-                }
-            }
-        break;
-        case ASE_ANIMATION_DIRECTION_PINGPONG:
-        case RAYLIB_ASEPRITE_DIRECTION_PINGPONG_REVERSE:
-            if (tag->direction > 0) {
+    // Advance as many frames as the elapsed time covers.
+    while (tag->timer <= 0 && !tag->paused) {
+        // Advance the frame and see if it's time to reset the position.
+        tag->currentFrame += tag->direction;
+        switch ((int)aseTag->loop_animation_direction) {
+            case ASE_ANIMATION_DIRECTION_FORWARDS:
                 if (tag->currentFrame > aseTag->to_frame) {
-                    tag->direction = -1;
                     if (tag->loop) {
-                        tag->currentFrame = aseTag->to_frame - 1;
+                        tag->currentFrame = aseTag->from_frame;
                     } else {
                         tag->currentFrame = aseTag->to_frame;
                         tag->paused = true;
                     }
                 }
-            } else {
+            break;
+            case ASE_ANIMATION_DIRECTION_BACKWORDS:
                 if (tag->currentFrame < aseTag->from_frame) {
-                    tag->direction = 1;
                     if (tag->loop) {
-                        tag->currentFrame = aseTag->from_frame + 1;
+                        tag->currentFrame = aseTag->to_frame;
                     } else {
                         tag->currentFrame = aseTag->from_frame;
                         tag->paused = true;
                     }
                 }
-            }
-        break;
-        default:
-            // Unknown direction: keep the frame within the tag's range.
-            if (tag->currentFrame > aseTag->to_frame || tag->currentFrame < aseTag->from_frame) {
-                tag->currentFrame = aseTag->from_frame;
-            }
-        break;
-    }
+            break;
+            case ASE_ANIMATION_DIRECTION_PINGPONG:
+            case RAYLIB_ASEPRITE_DIRECTION_PINGPONG_REVERSE:
+                if (tag->direction > 0) {
+                    if (tag->currentFrame > aseTag->to_frame) {
+                        tag->direction = -1;
+                        if (tag->loop) {
+                            tag->currentFrame = aseTag->to_frame - 1;
+                        } else {
+                            tag->currentFrame = aseTag->to_frame;
+                            tag->paused = true;
+                        }
+                    }
+                } else {
+                    if (tag->currentFrame < aseTag->from_frame) {
+                        tag->direction = 1;
+                        if (tag->loop) {
+                            tag->currentFrame = aseTag->from_frame + 1;
+                        } else {
+                            tag->currentFrame = aseTag->from_frame;
+                            tag->paused = true;
+                        }
+                    }
+                }
+            break;
+            default:
+                // Unknown direction: keep the frame within the tag's range.
+                if (tag->currentFrame > aseTag->to_frame || tag->currentFrame < aseTag->from_frame) {
+                    tag->currentFrame = aseTag->from_frame;
+                }
+            break;
+        }
 
-    // Reset the timer.
-    // TODO(RobLoach): Add the original tag->timer to make up the different in frame time?
-    tag->timer = (float)(ase->frames[tag->currentFrame].duration_milliseconds) / 1000.0f /* + tag->timer; */;
+        // Carry the leftover time into the next frame.
+        float duration = (float)(ase->frames[tag->currentFrame].duration_milliseconds) / 1000.0f;
+        if (tag->paused || duration <= 0) {
+            tag->timer = duration;
+            break;
+        }
+        tag->timer += duration;
+    }
 }
 
 /**

@@ -94,6 +94,19 @@ int main(int argc, char *argv[]) {
         tag.tag->loop_animation_direction = ASE_ANIMATION_DIRECTION_PINGPONG;
     }
 
+    // UpdateAsepriteTag() carries leftover time across frames
+    {
+        AsepriteTag tag = LoadAsepriteTagFromIndex(aseprite, 0);
+        int start = tag.currentFrame;
+        float next = (float)aseprite.ase->frames[start + 1].duration_milliseconds / 1000.0f;
+        float after = (float)aseprite.ase->frames[start + 2].duration_milliseconds / 1000.0f;
+        tag.timer = -(next + after * 0.5f);
+        UpdateAsepriteTag(&tag);
+        assert(tag.currentFrame == start + 2);
+        assert(tag.timer > 0);
+        assert(tag.timer < after);
+    }
+
     // GetAsepriteTexture()
     Texture texture = GetAsepriteTexture(aseprite);
     assert(texture.width > 50);
