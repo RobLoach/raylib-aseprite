@@ -73,9 +73,14 @@ int main(int argc, char *argv[]) {
         int frame = GetAsepriteTagFrame(tag);
         assert(frame == 4);
 
+        SetAsepriteTagFrame(&tag, -1);
+        frame = GetAsepriteTagFrame(tag);
+        assert(frame == 9);
+        assert(tag.timer > 0);
+
         SetAsepriteTagFrame(&tag, -3);
         frame = GetAsepriteTagFrame(tag);
-        assert(frame == 9 - 3);
+        assert(frame == 9 - 2);
     }
 
     // UpdateAsepriteTag() with Ping-pong Reverse

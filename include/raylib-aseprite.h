@@ -556,7 +556,7 @@ void UpdateAsepriteTag(AsepriteTag* tag) {
  * Set which frame the Aseprite tag is on.
  *
  * @param tag The Aseprite tag to modify.
- * @param frameNumber Which frame to set the active tag to. If negative, will start from the end.
+ * @param frameNumber Which frame to set the active tag to. If negative, counts from the end (-1 is the last frame).
  */
 void SetAsepriteTagFrame(AsepriteTag* tag, int frameNumber) {
     if (tag == 0 || tag->tag == 0) {
@@ -569,7 +569,7 @@ void SetAsepriteTagFrame(AsepriteTag* tag, int frameNumber) {
         tag->currentFrame = tag->tag->from_frame + frameNumber;
     }
     else {
-        tag->currentFrame = tag->tag->to_frame + frameNumber;
+        tag->currentFrame = tag->tag->to_frame + frameNumber + 1;
     }
 
     // Bounds
@@ -578,6 +578,11 @@ void SetAsepriteTagFrame(AsepriteTag* tag, int frameNumber) {
     }
     else if (tag->currentFrame > tag->tag->to_frame) {
         tag->currentFrame = tag->tag->to_frame;
+    }
+
+    // Show the new frame for its full duration.
+    if (tag->aseprite.ase != 0) {
+        tag->timer = (float)(tag->aseprite.ase->frames[tag->currentFrame].duration_milliseconds) / 1000.0f;
     }
 }
 
